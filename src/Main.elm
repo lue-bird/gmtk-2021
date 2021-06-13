@@ -12,6 +12,8 @@ import Collage.Render
 import Collage.Text
 import Color exposing (Color, rgb, rgb255, rgba)
 import Color.Manipulate as Color
+import Element as Ui
+import Element.Background as Background
 import Html
 import Html.Attributes
 import Json.Decode
@@ -600,7 +602,8 @@ subscriptions _ _ =
         (\w h ->
             Resized (( w, h ) |> Xy.map toFloat)
         )
-    , Browser.Events.onAnimationFrame (Time.posixToMillis >> Frame)
+    , Browser.Events.onAnimationFrame
+        (Time.posixToMillis >> Frame)
     , Sub.map KeyMsg Keyboard.subscriptions
     ]
         |> Sub.batch
@@ -612,11 +615,13 @@ viewDocument _ model =
     , body =
         view model
             |> Collage.Render.svgBox model.windowSize
-            |> List.singleton
-            |> Html.div
+            |> Ui.html
+            |> Ui.layout
                 [ Html.Attributes.style "overflow" "hidden"
-                , Html.Attributes.style "background-color" "black"
-                , Html.Attributes.style "height" "100vh"
+                    |> Ui.htmlAttribute
+                , Ui.height Ui.fill
+                , Ui.width Ui.fill
+                , Background.color (Ui.rgb 0 0 0)
                 ]
             |> List.singleton
     }

@@ -10314,7 +10314,8 @@ var $author$project$Main$viewDocument = F2(
 					_List_fromArray(
 						[
 							A2($elm$html$Html$Attributes$style, 'overflow', 'hidden'),
-							A2($elm$html$Html$Attributes$style, 'background-color', 'black')
+							A2($elm$html$Html$Attributes$style, 'background-color', 'black'),
+							A2($elm$html$Html$Attributes$style, 'height', '100vh')
 						]),
 					$elm$core$List$singleton(
 						A2(

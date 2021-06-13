@@ -616,6 +616,7 @@ viewDocument _ model =
             |> Html.div
                 [ Html.Attributes.style "overflow" "hidden"
                 , Html.Attributes.style "background-color" "black"
+                , Html.Attributes.style "height" "100vh"
                 ]
             |> List.singleton
     }

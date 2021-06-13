@@ -8974,7 +8974,7 @@ var $author$project$Main$update = F2(
 																			},
 																			joiners)),
 																	$lue_bird$elm_xy$Xy$direction(
-																		$elm$core$Basics$turns(i / splitCount))),
+																		$elm$core$Basics$turns((i + 1) / splitCount))),
 																biggest.position),
 															v: function () {
 																var splitAngle = $lue_bird$elm_xy$Xy$toAngle(
@@ -9000,11 +9000,11 @@ var $author$project$Main$update = F2(
 																	$lue_bird$elm_xy$Xy$map,
 																	$elm$core$Basics$mul(5.3),
 																	$lue_bird$elm_xy$Xy$direction(
-																		(splitAngle + $elm$core$Basics$turns(1 / 4)) + $elm$core$Basics$turns(i / splitCount)));
+																		(splitAngle + $elm$core$Basics$turns(1 / 4)) + $elm$core$Basics$turns((i + 1) / splitCount)));
 															}()
 														});
 												},
-												A2($elm$core$List$range, 1, splitCount)));
+												A2($elm$core$List$range, 0, splitCount - 1)));
 										},
 										A2(
 											$elm$core$Maybe$andThen,

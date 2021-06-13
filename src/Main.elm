@@ -351,7 +351,7 @@ update _ msg =
                                                 [ planet ]
 
                                             else
-                                                List.range 1 splitCount
+                                                List.range 0 (splitCount - 1)
                                                     |> List.map
                                                         (\i ->
                                                             splitPlanet
@@ -367,7 +367,7 @@ update _ msg =
                                                                         (splitAngle
                                                                             + turns (1 / 4)
                                                                             + turns
-                                                                                (toFloat i / toFloat splitCount)
+                                                                                ((toFloat i + 1) / toFloat splitCount)
                                                                         )
                                                                         |> Xy.map ((*) 5.3)
                                                                 , position =
@@ -375,7 +375,7 @@ update _ msg =
                                                                         |> Xy.map2 (+)
                                                                             (Xy.direction
                                                                                 (turns
-                                                                                    (toFloat i / toFloat splitCount)
+                                                                                    ((toFloat i + 1) / toFloat splitCount)
                                                                                 )
                                                                                 |> Xy.map ((*) (sum .r joiners))
                                                                             )

@@ -8,12 +8,14 @@ import Browser
 import Browser.Dom
 import Browser.Events
 import Collage exposing (Collage)
+import Collage.Layout
 import Collage.Render
 import Collage.Text
 import Color exposing (Color, rgb, rgb255, rgba)
 import Color.Manipulate as Color
 import Element as Ui
 import Element.Background as Background
+import Element.Font as Font
 import Html
 import Html.Attributes
 import Json.Decode
@@ -45,15 +47,17 @@ type alias Model =
     { windowSize : Xy Float
     , pressedKeys : List Key
     , gameStage : GameStage
-    , stars : List Star
-    , explosions : List Explosion
     , timePlaying : Int -- millis
     , music : Maybe Audio.Source
     }
 
 
 type GameStage
-    = Playing (NonEmpty Planet) -- the head is the player
+    = Playing
+        { planets : NonEmpty Planet -- the head is the player
+        , stars : List Star
+        , explosions : List Explosion
+        }
     | GameOver
 
 
@@ -126,19 +130,20 @@ init =
     ( { windowSize = Xy.zero
       , pressedKeys = []
       , gameStage =
-            ( { v = Xy.zero
-              , position = Xy.zero
-              , r = 2
-              , color = rgb 1 1 0
-              , whenHit = Join
-              , tail = []
-              , deadTails = []
-              }
-            , []
-            )
+            { planets =
+                { v = Xy.zero
+                , position = Xy.zero
+                , r = 2
+                , color = rgb 1 1 0
+                , whenHit = Join
+                , tail = []
+                , deadTails = []
+                }
+                    |> List.NonEmpty.singleton
+            , stars = []
+            , explosions = []
+            }
                 |> Playing
-      , stars = []
-      , explosions = []
       , timePlaying = 0
       , music = Nothing
       }
@@ -185,8 +190,11 @@ update _ msg =
         Frame millis ->
             \model ->
                 case model.gameStage of
-                    Playing ( player_, nonPlayerPlanets ) ->
+                    Playing playing ->
                         let
+                            ( player_, nonPlayerPlanets ) =
+                                playing.planets
+
                             updatePlanet planet =
                                 let
                                     cappedV =
@@ -432,15 +440,22 @@ update _ msg =
                             | gameStage =
                                 case collidedPlanets of
                                     head :: tail ->
-                                        Playing ( head, tail )
+                                        if head.position == movedPlayer.position then
+                                            { playing
+                                                | planets = ( head, tail )
+                                                , explosions =
+                                                    playing.explosions
+                                                        |> List.map (\ex -> { ex | r = ex.r + 3 })
+                                                        |> List.filter (\{ r } -> r < 120)
+                                                        |> (++) newExplosions
+                                            }
+                                                |> Playing
+
+                                        else
+                                            GameOver
 
                                     [] ->
                                         GameOver
-                            , explosions =
-                                model.explosions
-                                    |> List.map (\ex -> { ex | r = ex.r + 3 })
-                                    |> List.filter (\{ r } -> r < 120)
-                                    |> (++) newExplosions
                             , timePlaying =
                                 model.timePlaying + 1
                           }
@@ -493,8 +508,15 @@ update _ msg =
                 ( { model
                     | gameStage =
                         case model.gameStage of
-                            Playing ( player_, tail ) ->
-                                Playing ( player_, planet :: tail )
+                            Playing playing ->
+                                let
+                                    ( player_, tail ) =
+                                        playing.planets
+                                in
+                                { playing
+                                    | planets = ( player_, planet :: tail )
+                                }
+                                    |> Playing
 
                             GameOver ->
                                 GameOver
@@ -506,14 +528,22 @@ update _ msg =
         StarsGenerated newStars ->
             \model ->
                 ( case model.gameStage of
-                    Playing ( player_, _ ) ->
+                    Playing playing ->
                         { model
-                            | stars =
-                                (model.stars
-                                    |> List.filter
-                                        (\star -> distance star player_ < 120)
-                                )
-                                    ++ newStars
+                            | gameStage =
+                                { playing
+                                    | stars =
+                                        let
+                                            player_ =
+                                                player playing.planets
+                                        in
+                                        (playing.stars
+                                            |> List.filter
+                                                (\star -> distance star player_ < 120)
+                                        )
+                                            ++ newStars
+                                }
+                                    |> Playing
                         }
 
                     GameOver ->
@@ -613,9 +643,18 @@ viewDocument : AudioData -> Model -> Browser.Document msg
 viewDocument _ model =
     { title = "time to face gravity."
     , body =
-        view model
-            |> Collage.Render.svgBox model.windowSize
-            |> Ui.html
+        let
+            content =
+                case model.gameStage of
+                    Playing playStage ->
+                        view model playStage
+                            |> Collage.Render.svgBox model.windowSize
+                            |> Ui.html
+
+                    GameOver ->
+                        viewGameOver
+        in
+        content
             |> Ui.layout
                 [ Html.Attributes.style "overflow" "hidden"
                     |> Ui.htmlAttribute
@@ -627,155 +666,161 @@ viewDocument _ model =
     }
 
 
-view : Model -> Collage msg
-view { windowSize, gameStage, stars, explosions } =
-    case gameStage of
-        Playing ( player_, planets_ ) ->
-            let
-                viewTail { tail, color, r } =
-                    [ Collage.solid (r * 2)
-                        (color
-                            |> Color.fadeOut 0.972
-                            |> Collage.uniform
-                        )
-                    , Collage.solid 0.07
-                        (color
-                            |> Color.fadeOut 0.45
-                            |> Collage.uniform
-                        )
-                    ]
-                        |> List.map
-                            (\traceStyle ->
-                                tail
-                                    |> Collage.path
-                                    |> Collage.traced traceStyle
-                            )
-                        |> Collage.group
+viewGameOver : Ui.Element msg
+viewGameOver =
+    Ui.text "Game over.\nReload the page and try again!"
+        |> Ui.el
+            [ Font.size 50
+            , Font.color (Ui.rgb 1 1 1)
+            , Ui.centerX
+            , Ui.centerY
+            ]
 
-                viewPlanet planet =
-                    let
-                        orbits =
-                            5
-                    in
-                    (case planet.whenHit of
-                        Join ->
-                            Collage.circle planet.r
-                                |> Collage.filled
-                                    (planet.color |> Collage.uniform)
 
-                        Kill ->
-                            Collage.ngon 5 planet.r
-                                |> Collage.outlined
-                                    (Collage.solid (planet.r / 2)
-                                        (planet.color
-                                            |> Color.darken 0.04
-                                            |> Collage.uniform
-                                        )
-                                    )
+view { windowSize } { stars, explosions, planets } =
+    let
+        ( player_, planets_ ) =
+            planets
 
-                        Split ->
-                            Collage.ngon 3 planet.r
-                                |> Collage.filled
-                                    (planet.color
-                                        |> Collage.uniform
-                                    )
-                                |> Collage.rotate
-                                    ((planet.v |> Xy.toAngle) + turns (1 / 12))
+        viewTail { tail, color, r } =
+            [ Collage.solid (r * 2)
+                (color
+                    |> Color.fadeOut 0.972
+                    |> Collage.uniform
+                )
+            , Collage.solid 0.07
+                (color
+                    |> Color.fadeOut 0.45
+                    |> Collage.uniform
+                )
+            ]
+                |> List.map
+                    (\traceStyle ->
+                        tail
+                            |> Collage.path
+                            |> Collage.traced traceStyle
                     )
-                        :: (List.range 1 orbits
-                                |> List.map
-                                    (\orbit ->
-                                        Collage.circle
-                                            (planet.r + toFloat orbit ^ 3 * 0.7)
-                                            |> Collage.outlined
-                                                (Collage.broken
-                                                    [ ( planet.r * 2 * pi - 32 |> round, 32 ) ]
-                                                    2
-                                                    (Collage.uniform
-                                                        (rgba 1 1 1 (0.025 - 0.025 * toFloat orbit / toFloat orbits))
-                                                    )
-                                                    |> (\style -> { style | cap = Collage.Round })
-                                                )
-                                    )
-                           )
-                        |> Collage.group
+                |> Collage.group
 
-                viewStar { position, r } =
-                    let
-                        viewTriangle =
-                            Collage.ngon 3 r
-                                |> Collage.filled
-                                    (rgba 1 1 1 0.5 |> Collage.uniform)
-                    in
-                    [ viewTriangle
-                    , viewTriangle
-                        |> Collage.rotate (turns (1 / 6))
-                    ]
-                        |> Collage.group
-                        |> Collage.shift position
+        viewPlanet planet =
+            let
+                orbits =
+                    5
+            in
+            (case planet.whenHit of
+                Join ->
+                    Collage.circle planet.r
+                        |> Collage.filled
+                            (planet.color |> Collage.uniform)
 
-                viewExplosion { r, color, position } =
-                    [ List.range 0 32
+                Kill ->
+                    Collage.ngon 5 planet.r
+                        |> Collage.outlined
+                            (Collage.solid (planet.r / 2)
+                                (planet.color
+                                    |> Color.darken 0.04
+                                    |> Collage.uniform
+                                )
+                            )
+
+                Split ->
+                    Collage.ngon 3 planet.r
+                        |> Collage.filled
+                            (planet.color
+                                |> Collage.uniform
+                            )
+                        |> Collage.rotate
+                            ((planet.v |> Xy.toAngle) + turns (1 / 12))
+            )
+                :: (List.range 1 orbits
                         |> List.map
-                            (\i ->
-                                Xy.direction (turns (toFloat i / 34))
-                                    |> Xy.map
-                                        ((*)
-                                            (if (i |> modBy 2) == 0 then
-                                                0
-
-                                             else
-                                                r * 1.7
+                            (\orbit ->
+                                Collage.circle
+                                    (planet.r + toFloat orbit ^ 3 * 0.7)
+                                    |> Collage.outlined
+                                        (Collage.broken
+                                            [ ( planet.r * 2 * pi - 32 |> round, 32 ) ]
+                                            2
+                                            (Collage.uniform
+                                                (rgba 1 1 1 (0.025 - 0.025 * toFloat orbit / toFloat orbits))
                                             )
+                                            |> (\style -> { style | cap = Collage.Round })
                                         )
                             )
-                        |> Collage.path
-                        |> Collage.traced
-                            (color
-                                |> Color.fadeOut (1 - 0.2 / (r ^ 1.2))
-                                |> Collage.uniform
-                                |> Collage.solid 1
-                            )
-                    , Collage.circle r
-                        |> Collage.filled
-                            (color
-                                |> Color.fadeOut (1 - 1 / (r ^ 1.2))
-                                |> Collage.uniform
-                            )
-                    ]
-                        |> Collage.group
-                        |> Collage.shift position
-            in
-            [ [ viewPlanet player_
-              , viewTail player_
-                    :: (planets_
-                            |> List.map
-                                (\planet ->
-                                    [ viewTail planet
-                                    , viewPlanet planet
-                                        |> Collage.shift planet.position
-                                    ]
-                                )
-                            |> List.concat
-                       )
-                    ++ (stars |> List.map viewStar)
-                    ++ (explosions |> List.map viewExplosion)
-                    |> Collage.group
-                    |> Collage.shift
-                        (player_.position |> Xy.map (\c -> -c))
-              ]
+                   )
                 |> Collage.group
-                |> Collage.scale 10
-            , Collage.rectangle (x windowSize) (y windowSize)
-                |> Collage.filled
-                    (Collage.uniform (rgb 0 0 0))
+
+        viewStar { position, r } =
+            let
+                viewTriangle =
+                    Collage.ngon 3 r
+                        |> Collage.filled
+                            (rgba 1 1 1 0.5 |> Collage.uniform)
+            in
+            [ viewTriangle
+            , viewTriangle
+                |> Collage.rotate (turns (1 / 6))
             ]
                 |> Collage.group
+                |> Collage.shift position
 
-        GameOver ->
-            Collage.Text.fromString "Game over. Reload the page and try again!"
-                |> Collage.Text.color Color.black
-                |> Collage.rendered
+        viewExplosion { r, color, position } =
+            [ List.range 0 32
+                |> List.map
+                    (\i ->
+                        Xy.direction (turns (toFloat i / 34))
+                            |> Xy.map
+                                ((*)
+                                    (if (i |> modBy 2) == 0 then
+                                        0
+
+                                     else
+                                        r * 1.7
+                                    )
+                                )
+                    )
+                |> Collage.path
+                |> Collage.traced
+                    (color
+                        |> Color.fadeOut (1 - 0.2 / (r ^ 1.2))
+                        |> Collage.uniform
+                        |> Collage.solid 1
+                    )
+            , Collage.circle r
+                |> Collage.filled
+                    (color
+                        |> Color.fadeOut (1 - 1 / (r ^ 1.2))
+                        |> Collage.uniform
+                    )
+            ]
+                |> Collage.group
+                |> Collage.shift position
+    in
+    [ [ viewPlanet player_
+      , viewTail player_
+            :: (planets_
+                    |> List.map
+                        (\planet ->
+                            [ viewTail planet
+                            , viewPlanet planet
+                                |> Collage.shift planet.position
+                            ]
+                        )
+                    |> List.concat
+               )
+            ++ (stars |> List.map viewStar)
+            ++ (explosions |> List.map viewExplosion)
+            |> Collage.group
+            |> Collage.shift
+                (player_.position |> Xy.map (\c -> -c))
+      ]
+        |> Collage.group
+        |> Collage.scale 10
+    , Collage.rectangle (x windowSize) (y windowSize)
+        |> Collage.filled
+            (Collage.uniform (rgb 0 0 0))
+    ]
+        |> Collage.group
 
 
 audio : AudioData -> Model -> Audio

@@ -7536,25 +7536,29 @@ var $avh4$elm_color$Color$rgb = F3(
 	function (r, g, b) {
 		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, 1.0);
 	});
+var $turboMaCk$non_empty_list_alias$List$NonEmpty$singleton = function (h) {
+	return _Utils_Tuple2(h, _List_Nil);
+};
 var $lue_bird$elm_xy$Xy$zero = $lue_bird$elm_xy$Xy$both(0);
 var $author$project$Main$init = _Utils_Tuple3(
 	{
-		explosions: _List_Nil,
 		gameStage: $author$project$Main$Playing(
-			_Utils_Tuple2(
-				{
-					color: A3($avh4$elm_color$Color$rgb, 1, 1, 0),
-					deadTails: _List_Nil,
-					position: $lue_bird$elm_xy$Xy$zero,
-					r: 2,
-					tail: _List_Nil,
-					v: $lue_bird$elm_xy$Xy$zero,
-					whenHit: $author$project$Main$Join
-				},
-				_List_Nil)),
+			{
+				explosions: _List_Nil,
+				planets: $turboMaCk$non_empty_list_alias$List$NonEmpty$singleton(
+					{
+						color: A3($avh4$elm_color$Color$rgb, 1, 1, 0),
+						deadTails: _List_Nil,
+						position: $lue_bird$elm_xy$Xy$zero,
+						r: 2,
+						tail: _List_Nil,
+						v: $lue_bird$elm_xy$Xy$zero,
+						whenHit: $author$project$Main$Join
+					}),
+				stars: _List_Nil
+			}),
 		music: $elm$core$Maybe$Nothing,
 		pressedKeys: _List_Nil,
-		stars: _List_Nil,
 		timePlaying: 0,
 		windowSize: $lue_bird$elm_xy$Xy$zero
 	},
@@ -8226,6 +8230,7 @@ var $turboMaCk$non_empty_list_alias$List$NonEmpty$maximum = function (ne) {
 };
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$player = $turboMaCk$non_empty_list_alias$List$NonEmpty$head;
 var $elm_community$list_extra$List$Extra$removeAt = F2(
 	function (index, l) {
 		if (index < 0) {
@@ -8732,9 +8737,7 @@ var $author$project$Main$update = F2(
 				return function (model) {
 					var _v2 = model.gameStage;
 					if (_v2.$ === 'Playing') {
-						var _v3 = _v2.a;
-						var player_ = _v3.a;
-						var nonPlayerPlanets = _v3.b;
+						var playing = _v2.a;
 						var updateTail = $turboMaCk$non_empty_list_alias$List$NonEmpty$map(
 							function (planet) {
 								return _Utils_update(
@@ -8795,21 +8798,21 @@ var $author$project$Main$update = F2(
 									A2($author$project$Main$distance, planet, other),
 									A2($elm$core$Basics$max, planet.r, other.r)) < 0;
 							});
-						var overlaps = function (_v4) {
-							var planet = _v4.a;
-							var others = _v4.b;
+						var overlaps = function (_v3) {
+							var planet = _v3.a;
+							var others = _v3.b;
 							return _Utils_ap(
 								function () {
-									var _v5 = A2(
+									var _v4 = A2(
 										$elm$core$List$filter,
 										A2(
 											$elm$core$Basics$composeL,
 											$elm$core$Basics$not,
 											overlap(planet)),
 										others);
-									if (_v5.b) {
-										var head = _v5.a;
-										var tail = _v5.b;
+									if (_v4.b) {
+										var head = _v4.a;
+										var tail = _v4.b;
 										return overlaps(
 											_Utils_Tuple2(head, tail));
 									} else {
@@ -8889,9 +8892,9 @@ var $author$project$Main$update = F2(
 												return $turboMaCk$non_empty_list_alias$List$NonEmpty$sum(
 													A2(
 														$turboMaCk$non_empty_list_alias$List$NonEmpty$map,
-														function (_v7) {
-															var r = _v7.r;
-															var color = _v7.color;
+														function (_v6) {
+															var r = _v6.r;
+															var color = _v6.color;
 															return r * component(
 																$avh4$elm_color$Color$toRgba(color));
 														},
@@ -8924,9 +8927,9 @@ var $author$project$Main$update = F2(
 															},
 															$elm$core$Basics$eq(biggestR)),
 														overlapping)));
-											var splitPlanet = function (_v6) {
-												var v = _v6.v;
-												var position = _v6.position;
+											var splitPlanet = function (_v5) {
+												var v = _v5.v;
+												var position = _v5.position;
 												return {
 													color: A3(
 														$avh4$elm_color$Color$rgb,
@@ -9021,6 +9024,9 @@ var $author$project$Main$update = F2(
 							$elm$core$Basics$toFloat,
 							$lue_bird$elm_xy$Xy$fromXY(
 								$ohanhi$keyboard$Keyboard$Arrows$arrows(model.pressedKeys)));
+						var _v7 = playing.planets;
+						var player_ = _v7.a;
+						var nonPlayerPlanets = _v7.b;
 						var planetsUpdatedPlayer = _Utils_Tuple2(
 							A2(
 								$author$project$Main$mapV,
@@ -9063,28 +9069,32 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									explosions: _Utils_ap(
-										newExplosions,
-										A2(
-											$elm$core$List$filter,
-											function (_v9) {
-												var r = _v9.r;
-												return r < 120;
-											},
-											A2(
-												$elm$core$List$map,
-												function (ex) {
-													return _Utils_update(
-														ex,
-														{r: ex.r + 3});
-												},
-												model.explosions))),
 									gameStage: function () {
 										if (collidedPlanets.b) {
 											var head = collidedPlanets.a;
 											var tail = collidedPlanets.b;
-											return $author$project$Main$Playing(
-												_Utils_Tuple2(head, tail));
+											return _Utils_eq(head.position, movedPlayer.position) ? $author$project$Main$Playing(
+												_Utils_update(
+													playing,
+													{
+														explosions: _Utils_ap(
+															newExplosions,
+															A2(
+																$elm$core$List$filter,
+																function (_v10) {
+																	var r = _v10.r;
+																	return r < 120;
+																},
+																A2(
+																	$elm$core$List$map,
+																	function (ex) {
+																		return _Utils_update(
+																			ex,
+																			{r: ex.r + 3});
+																	},
+																	playing.explosions))),
+														planets: _Utils_Tuple2(head, tail)
+													})) : $author$project$Main$GameOver;
 										} else {
 											return $author$project$Main$GameOver;
 										}
@@ -9142,13 +9152,18 @@ var $author$project$Main$update = F2(
 								gameStage: function () {
 									var _v13 = model.gameStage;
 									if (_v13.$ === 'Playing') {
-										var _v14 = _v13.a;
+										var playing = _v13.a;
+										var _v14 = playing.planets;
 										var player_ = _v14.a;
 										var tail = _v14.b;
 										return $author$project$Main$Playing(
-											_Utils_Tuple2(
-												player_,
-												A2($elm$core$List$cons, planet, tail)));
+											_Utils_update(
+												playing,
+												{
+													planets: _Utils_Tuple2(
+														player_,
+														A2($elm$core$List$cons, planet, tail))
+												}));
 									} else {
 										return $author$project$Main$GameOver;
 									}
@@ -9164,19 +9179,26 @@ var $author$project$Main$update = F2(
 						function () {
 							var _v15 = model.gameStage;
 							if (_v15.$ === 'Playing') {
-								var _v16 = _v15.a;
-								var player_ = _v16.a;
+								var playing = _v15.a;
 								return _Utils_update(
 									model,
 									{
-										stars: _Utils_ap(
-											A2(
-												$elm$core$List$filter,
-												function (star) {
-													return A2($author$project$Main$distance, star, player_) < 120;
-												},
-												model.stars),
-											newStars)
+										gameStage: $author$project$Main$Playing(
+											_Utils_update(
+												playing,
+												{
+													stars: function () {
+														var player_ = $author$project$Main$player(playing.planets);
+														return _Utils_ap(
+															A2(
+																$elm$core$List$filter,
+																function (star) {
+																	return A2($author$project$Main$distance, star, player_) < 120;
+																},
+																playing.stars),
+															newStars);
+													}()
+												}))
 									});
 							} else {
 								return model;
@@ -15485,9 +15507,9 @@ var $timjs$elm_collage$Collage$Render$svgBox = F2(
 				collage));
 	});
 var $timjs$elm_collage$Collage$Round = {$: 'Round'};
-var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $timjs$elm_collage$Collage$Flat = {$: 'Flat'};
 var $timjs$elm_collage$Collage$Sharp = {$: 'Sharp'};
+var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $timjs$elm_collage$Collage$thin = 2.0;
 var $timjs$elm_collage$Collage$uniform = $timjs$elm_collage$Collage$Core$Uniform;
 var $timjs$elm_collage$Collage$defaultLineStyle = {
@@ -15508,21 +15530,6 @@ var $timjs$elm_collage$Collage$Core$Circle = function (a) {
 	return {$: 'Circle', a: a};
 };
 var $timjs$elm_collage$Collage$circle = $timjs$elm_collage$Collage$Core$Circle;
-var $timjs$elm_collage$Collage$Core$Chunk = F2(
-	function (a, b) {
-		return {$: 'Chunk', a: a, b: b};
-	});
-var $timjs$elm_collage$Collage$Text$color = F2(
-	function (newcolor, _v0) {
-		var sty = _v0.a;
-		var str = _v0.b;
-		return A2(
-			$timjs$elm_collage$Collage$Core$Chunk,
-			_Utils_update(
-				sty,
-				{color: newcolor}),
-			str);
-	});
 var $avh4$elm_color$Color$hsla = F4(
 	function (hue, sat, light, alpha) {
 		var _v0 = _Utils_Tuple3(hue, sat, light);
@@ -15627,13 +15634,6 @@ var $timjs$elm_collage$Collage$filled = function (fill) {
 	return $timjs$elm_collage$Collage$styled(
 		_Utils_Tuple2(fill, $timjs$elm_collage$Collage$invisible));
 };
-var $timjs$elm_collage$Collage$Text$None = {$: 'None'};
-var $timjs$elm_collage$Collage$Text$Regular = {$: 'Regular'};
-var $timjs$elm_collage$Collage$Text$Sansserif = {$: 'Sansserif'};
-var $timjs$elm_collage$Collage$Text$Upright = {$: 'Upright'};
-var $timjs$elm_collage$Collage$Text$normal = 16;
-var $timjs$elm_collage$Collage$Text$defaultStyle = {color: $avh4$elm_color$Color$black, line: $timjs$elm_collage$Collage$Text$None, shape: $timjs$elm_collage$Collage$Text$Upright, size: $timjs$elm_collage$Collage$Text$normal, typeface: $timjs$elm_collage$Collage$Text$Sansserif, weight: $timjs$elm_collage$Collage$Text$Regular};
-var $timjs$elm_collage$Collage$Text$fromString = $timjs$elm_collage$Collage$Core$Chunk($timjs$elm_collage$Collage$Text$defaultStyle);
 var $timjs$elm_collage$Collage$group = A2($elm$core$Basics$composeL, $timjs$elm_collage$Collage$Core$collage, $timjs$elm_collage$Collage$Core$Group);
 var $timjs$elm_collage$Collage$Core$Polygon = function (a) {
 	return {$: 'Polygon', a: a};
@@ -15671,28 +15671,6 @@ var $timjs$elm_collage$Collage$rectangle = F2(
 	function (w, h) {
 		return A3($timjs$elm_collage$Collage$roundedRectangle, w, h, 0);
 	});
-var $timjs$elm_collage$Collage$Core$Text = F2(
-	function (a, b) {
-		return {$: 'Text', a: a, b: b};
-	});
-var $timjs$elm_collage$Collage$Text$height = function (_v0) {
-	var sty = _v0.a;
-	return sty.size;
-};
-var $timjs$elm_collage$Collage$Text$width = function (text) {
-	var sty = text.a;
-	var str = text.b;
-	return ($timjs$elm_collage$Collage$Text$height(text) / 2) * $elm$core$String$length(str);
-};
-var $timjs$elm_collage$Collage$rendered = function (text) {
-	return $timjs$elm_collage$Collage$Core$collage(
-		A2(
-			$timjs$elm_collage$Collage$Core$Text,
-			_Utils_Tuple2(
-				$timjs$elm_collage$Collage$Text$width(text),
-				$timjs$elm_collage$Collage$Text$height(text)),
-			text));
-};
 var $avh4$elm_color$Color$rgba = F4(
 	function (r, g, b, a) {
 		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, a);
@@ -15728,15 +15706,12 @@ var $timjs$elm_collage$Collage$traced = F2(
 		return $timjs$elm_collage$Collage$Core$collage(
 			A2($timjs$elm_collage$Collage$Core$Path, linestyle, p));
 	});
-var $author$project$Main$view = function (_v0) {
-	var windowSize = _v0.windowSize;
-	var gameStage = _v0.gameStage;
-	var stars = _v0.stars;
-	var explosions = _v0.explosions;
-	if (gameStage.$ === 'Playing') {
-		var _v2 = gameStage.a;
-		var player_ = _v2.a;
-		var planets_ = _v2.b;
+var $author$project$Main$view = F2(
+	function (_v0, _v1) {
+		var windowSize = _v0.windowSize;
+		var stars = _v1.stars;
+		var explosions = _v1.explosions;
+		var planets = _v1.planets;
 		var viewTail = function (_v6) {
 			var tail = _v6.tail;
 			var color = _v6.color;
@@ -15885,6 +15860,9 @@ var $author$project$Main$view = function (_v0) {
 							$timjs$elm_collage$Collage$circle(r))
 						])));
 		};
+		var _v2 = planets;
+		var player_ = _v2.a;
+		var planets_ = _v2.b;
 		return $timjs$elm_collage$Collage$group(
 			_List_fromArray(
 				[
@@ -15935,38 +15913,104 @@ var $author$project$Main$view = function (_v0) {
 						$lue_bird$elm_xy$Xy$x(windowSize),
 						$lue_bird$elm_xy$Xy$y(windowSize)))
 				]));
-	} else {
-		return $timjs$elm_collage$Collage$rendered(
-			A2(
-				$timjs$elm_collage$Collage$Text$color,
-				$avh4$elm_color$Color$black,
-				$timjs$elm_collage$Collage$Text$fromString('Game over. Reload the page and try again!')));
-	}
+	});
+var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
+	return {$: 'AlignX', a: a};
 };
+var $mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
+var $mdgriffith$elm_ui$Element$centerX = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$CenterX);
+var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
+	return {$: 'AlignY', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
+var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
+var $mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'fc-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(fontColor),
+			'color',
+			fontColor));
+};
+var $mdgriffith$elm_ui$Internal$Model$Content = {$: 'Content'};
+var $mdgriffith$elm_ui$Element$shrink = $mdgriffith$elm_ui$Internal$Model$Content;
 var $mdgriffith$elm_ui$Internal$Model$Width = function (a) {
 	return {$: 'Width', a: a};
 };
 var $mdgriffith$elm_ui$Element$width = $mdgriffith$elm_ui$Internal$Model$Width;
+var $mdgriffith$elm_ui$Element$el = F2(
+	function (attrs, child) {
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asEl,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
+					attrs)),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[child])));
+	});
+var $mdgriffith$elm_ui$Element$Font$size = function (i) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontSize,
+		$mdgriffith$elm_ui$Internal$Model$FontSize(i));
+};
+var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
+	return {$: 'Text', a: a};
+};
+var $mdgriffith$elm_ui$Element$text = function (content) {
+	return $mdgriffith$elm_ui$Internal$Model$Text(content);
+};
+var $author$project$Main$viewGameOver = A2(
+	$mdgriffith$elm_ui$Element$el,
+	_List_fromArray(
+		[
+			$mdgriffith$elm_ui$Element$Font$size(50),
+			$mdgriffith$elm_ui$Element$Font$color(
+			A3($mdgriffith$elm_ui$Element$rgb, 1, 1, 1)),
+			$mdgriffith$elm_ui$Element$centerX,
+			$mdgriffith$elm_ui$Element$centerY
+		]),
+	$mdgriffith$elm_ui$Element$text('Game over.\nReload the page and try again!'));
 var $author$project$Main$viewDocument = F2(
 	function (_v0, model) {
 		return {
-			body: $elm$core$List$singleton(
-				A2(
-					$mdgriffith$elm_ui$Element$layout,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$htmlAttribute(
-							A2($elm$html$Html$Attributes$style, 'overflow', 'hidden')),
-							$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
-							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-							$mdgriffith$elm_ui$Element$Background$color(
-							A3($mdgriffith$elm_ui$Element$rgb, 0, 0, 0))
-						]),
-					$mdgriffith$elm_ui$Element$html(
-						A2(
-							$timjs$elm_collage$Collage$Render$svgBox,
-							model.windowSize,
-							$author$project$Main$view(model))))),
+			body: function () {
+				var content = function () {
+					var _v1 = model.gameStage;
+					if (_v1.$ === 'Playing') {
+						var playStage = _v1.a;
+						return $mdgriffith$elm_ui$Element$html(
+							A2(
+								$timjs$elm_collage$Collage$Render$svgBox,
+								model.windowSize,
+								A2($author$project$Main$view, model, playStage)));
+					} else {
+						return $author$project$Main$viewGameOver;
+					}
+				}();
+				return $elm$core$List$singleton(
+					A2(
+						$mdgriffith$elm_ui$Element$layout,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$htmlAttribute(
+								A2($elm$html$Html$Attributes$style, 'overflow', 'hidden')),
+								$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
+								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+								$mdgriffith$elm_ui$Element$Background$color(
+								A3($mdgriffith$elm_ui$Element$rgb, 0, 0, 0))
+							]),
+						content));
+			}(),
 			title: 'time to face gravity.'
 		};
 	});

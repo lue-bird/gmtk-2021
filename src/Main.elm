@@ -164,7 +164,7 @@ init =
            ]
         |> Cmd.batch
     , Audio.loadAudio SoundLoadingResult
-        "https://cors-anywhere.herokuapp.com/https://freepd.com/music/Wakka%20Wakka.mp3"
+        "https://github.com/lue-bird/time-to-face-gravity/blob/master/music/space%202.wav"
     )
 
 

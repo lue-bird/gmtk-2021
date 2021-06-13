@@ -7550,7 +7550,7 @@ var $author$project$Main$init = _Utils_Tuple3(
 						color: A3($avh4$elm_color$Color$rgb, 1, 1, 0),
 						deadTails: _List_Nil,
 						position: $lue_bird$elm_xy$Xy$zero,
-						r: 2,
+						r: 2.2,
 						tail: _List_Nil,
 						v: $lue_bird$elm_xy$Xy$zero,
 						whenHit: $author$project$Main$Join
@@ -7592,7 +7592,7 @@ var $author$project$Main$init = _Utils_Tuple3(
 						A2($elm$core$Basics$composeR, $lue_bird$elm_xy$Xy$fromSize, $author$project$Main$Resized)),
 					$elm$browser$Browser$Dom$getViewport)
 				]))),
-	A2($MartinSStewart$elm_audio$Audio$loadAudio, $author$project$Main$SoundLoadingResult, 'https://cors-anywhere.herokuapp.com/https://freepd.com/music/Wakka%20Wakka.mp3'));
+	A2($MartinSStewart$elm_audio$Audio$loadAudio, $author$project$Main$SoundLoadingResult, 'https://github.com/lue-bird/time-to-face-gravity/blob/master/music/space%202.wav'));
 var $author$project$Main$Frame = function (a) {
 	return {$: 'Frame', a: a};
 };
@@ -16103,11 +16103,59 @@ var $mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
+var $mdgriffith$elm_ui$Element$el = F2(
+	function (attrs, child) {
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asEl,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
+					attrs)),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[child])));
+	});
+var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
+var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
+var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderRound,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Single,
+			'br-' + $elm$core$String$fromInt(radius),
+			'border-radius',
+			$elm$core$String$fromInt(radius) + 'px'));
+};
 var $mdgriffith$elm_ui$Element$Font$size = function (i) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
 		$mdgriffith$elm_ui$Internal$Flag$fontSize,
 		$mdgriffith$elm_ui$Internal$Model$FontSize(i));
+};
+var $mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
+	function (a, b, c) {
+		return {$: 'SpacingStyle', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$spacing = $mdgriffith$elm_ui$Internal$Flag$flag(3);
+var $mdgriffith$elm_ui$Internal$Model$spacingName = F2(
+	function (x, y) {
+		return 'spacing-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y)));
+	});
+var $mdgriffith$elm_ui$Element$spacing = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$spacing,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$SpacingStyle,
+			A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
+			x,
+			x));
 };
 var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 	return {$: 'Text', a: a};
@@ -16119,18 +16167,30 @@ var $author$project$Main$viewGameOver = A2(
 	$mdgriffith$elm_ui$Element$column,
 	_List_fromArray(
 		[
-			$mdgriffith$elm_ui$Element$Font$size(50),
 			$mdgriffith$elm_ui$Element$Font$color(
 			A3($mdgriffith$elm_ui$Element$rgb, 1, 1, 1)),
 			$mdgriffith$elm_ui$Element$centerX,
-			$mdgriffith$elm_ui$Element$centerY
+			$mdgriffith$elm_ui$Element$centerY,
+			$mdgriffith$elm_ui$Element$spacing(10)
 		]),
 	_List_fromArray(
 		[
-			$mdgriffith$elm_ui$Element$text('Game over.'),
+			A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$Font$size(50)
+				]),
+			$mdgriffith$elm_ui$Element$text('Game over.')),
 			A2(
 			$mdgriffith$elm_ui$Element$Input$button,
-			_List_Nil,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$Font$size(33),
+					$mdgriffith$elm_ui$Element$Background$color(
+					A4($mdgriffith$elm_ui$Element$rgba, 0, 1, 1, 0.2)),
+					$mdgriffith$elm_ui$Element$Border$rounded(100)
+				]),
 			{
 				label: $mdgriffith$elm_ui$Element$text('Try again!'),
 				onPress: $elm$core$Maybe$Just($author$project$Main$NewGameClicked)

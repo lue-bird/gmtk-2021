@@ -15,6 +15,7 @@ import Color exposing (Color, rgb, rgb255, rgba)
 import Color.Manipulate as Color
 import Element as Ui
 import Element.Background as Background
+import Element.Border as UiBorder
 import Element.Font as Font
 import Element.Input as UiInput
 import Html
@@ -137,7 +138,7 @@ init =
             { planets =
                 { v = Xy.zero
                 , position = Xy.zero
-                , r = 2
+                , r = 2.2
                 , color = rgb 1 1 0
                 , whenHit = Join
                 , tail = []
@@ -676,16 +677,23 @@ viewDocument _ model =
 viewGameOver : Ui.Element Msg
 viewGameOver =
     [ Ui.text "Game over."
-    , UiInput.button []
+        |> Ui.el
+            [ Font.size 50
+            ]
+    , UiInput.button
+        [ Font.size 33
+        , Background.color (Ui.rgba 0 1 1 0.2)
+        , UiBorder.rounded 100
+        ]
         { label = Ui.text "Try again!"
         , onPress = Just NewGameClicked
         }
     ]
         |> Ui.column
-            [ Font.size 50
-            , Font.color (Ui.rgb 1 1 1)
+            [ Font.color (Ui.rgb 1 1 1)
             , Ui.centerX
             , Ui.centerY
+            , Ui.spacing 10
             ]
 
 

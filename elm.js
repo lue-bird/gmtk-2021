@@ -9843,9 +9843,9 @@ var $timjs$elm_collage$Collage$Render$svgBox = F2(
 				collage));
 	});
 var $timjs$elm_collage$Collage$Round = {$: 'Round'};
+var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $timjs$elm_collage$Collage$Flat = {$: 'Flat'};
 var $timjs$elm_collage$Collage$Sharp = {$: 'Sharp'};
-var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $timjs$elm_collage$Collage$thin = 2.0;
 var $timjs$elm_collage$Collage$uniform = $timjs$elm_collage$Collage$Core$Uniform;
 var $timjs$elm_collage$Collage$defaultLineStyle = {
@@ -9866,6 +9866,21 @@ var $timjs$elm_collage$Collage$Core$Circle = function (a) {
 	return {$: 'Circle', a: a};
 };
 var $timjs$elm_collage$Collage$circle = $timjs$elm_collage$Collage$Core$Circle;
+var $timjs$elm_collage$Collage$Core$Chunk = F2(
+	function (a, b) {
+		return {$: 'Chunk', a: a, b: b};
+	});
+var $timjs$elm_collage$Collage$Text$color = F2(
+	function (newcolor, _v0) {
+		var sty = _v0.a;
+		var str = _v0.b;
+		return A2(
+			$timjs$elm_collage$Collage$Core$Chunk,
+			_Utils_update(
+				sty,
+				{color: newcolor}),
+			str);
+	});
 var $avh4$elm_color$Color$hsla = F4(
 	function (hue, sat, light, alpha) {
 		var _v0 = _Utils_Tuple3(hue, sat, light);
@@ -9974,6 +9989,13 @@ var $timjs$elm_collage$Collage$filled = function (fill) {
 	return $timjs$elm_collage$Collage$styled(
 		_Utils_Tuple2(fill, $timjs$elm_collage$Collage$invisible));
 };
+var $timjs$elm_collage$Collage$Text$None = {$: 'None'};
+var $timjs$elm_collage$Collage$Text$Regular = {$: 'Regular'};
+var $timjs$elm_collage$Collage$Text$Sansserif = {$: 'Sansserif'};
+var $timjs$elm_collage$Collage$Text$Upright = {$: 'Upright'};
+var $timjs$elm_collage$Collage$Text$normal = 16;
+var $timjs$elm_collage$Collage$Text$defaultStyle = {color: $avh4$elm_color$Color$black, line: $timjs$elm_collage$Collage$Text$None, shape: $timjs$elm_collage$Collage$Text$Upright, size: $timjs$elm_collage$Collage$Text$normal, typeface: $timjs$elm_collage$Collage$Text$Sansserif, weight: $timjs$elm_collage$Collage$Text$Regular};
+var $timjs$elm_collage$Collage$Text$fromString = $timjs$elm_collage$Collage$Core$Chunk($timjs$elm_collage$Collage$Text$defaultStyle);
 var $timjs$elm_collage$Collage$group = A2($elm$core$Basics$composeL, $timjs$elm_collage$Collage$Core$collage, $timjs$elm_collage$Collage$Core$Group);
 var $timjs$elm_collage$Collage$Core$Polygon = function (a) {
 	return {$: 'Polygon', a: a};
@@ -10011,6 +10033,28 @@ var $timjs$elm_collage$Collage$rectangle = F2(
 	function (w, h) {
 		return A3($timjs$elm_collage$Collage$roundedRectangle, w, h, 0);
 	});
+var $timjs$elm_collage$Collage$Core$Text = F2(
+	function (a, b) {
+		return {$: 'Text', a: a, b: b};
+	});
+var $timjs$elm_collage$Collage$Text$height = function (_v0) {
+	var sty = _v0.a;
+	return sty.size;
+};
+var $timjs$elm_collage$Collage$Text$width = function (text) {
+	var sty = text.a;
+	var str = text.b;
+	return ($timjs$elm_collage$Collage$Text$height(text) / 2) * $elm$core$String$length(str);
+};
+var $timjs$elm_collage$Collage$rendered = function (text) {
+	return $timjs$elm_collage$Collage$Core$collage(
+		A2(
+			$timjs$elm_collage$Collage$Core$Text,
+			_Utils_Tuple2(
+				$timjs$elm_collage$Collage$Text$width(text),
+				$timjs$elm_collage$Collage$Text$height(text)),
+			text));
+};
 var $avh4$elm_color$Color$rgba = F4(
 	function (r, g, b, a) {
 		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, a);
@@ -10254,7 +10298,11 @@ var $author$project$Main$view = function (_v0) {
 						$lue_bird$elm_xy$Xy$y(windowSize)))
 				]));
 	} else {
-		return $timjs$elm_collage$Collage$group(_List_Nil);
+		return $timjs$elm_collage$Collage$rendered(
+			A2(
+				$timjs$elm_collage$Collage$Text$color,
+				$avh4$elm_color$Color$black,
+				$timjs$elm_collage$Collage$Text$fromString('Game over. Reload the page and try again!')));
 	}
 };
 var $author$project$Main$viewDocument = F2(

@@ -9,6 +9,7 @@ import Browser.Dom
 import Browser.Events
 import Collage exposing (Collage)
 import Collage.Render
+import Collage.Text
 import Color exposing (Color, rgb, rgb255, rgba)
 import Color.Manipulate as Color
 import Html
@@ -766,7 +767,9 @@ view { windowSize, gameStage, stars, explosions } =
                 |> Collage.group
 
         GameOver ->
-            Collage.group []
+            Collage.Text.fromString "Game over. Reload the page and try again!"
+                |> Collage.Text.color Color.black
+                |> Collage.rendered
 
 
 audio : AudioData -> Model -> Audio

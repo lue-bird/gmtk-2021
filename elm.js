@@ -6993,6 +6993,7 @@ var $author$project$Main$Join = {$: 'Join'};
 var $author$project$Main$PlanetGenerated = function (a) {
 	return {$: 'PlanetGenerated', a: a};
 };
+var $author$project$Main$Player = {$: 'Player'};
 var $author$project$Main$Playing = function (a) {
 	return {$: 'Playing', a: a};
 };
@@ -7179,9 +7180,10 @@ var $MartinSStewart$elm_audio$Audio$loadAudio = F2(
 			});
 	});
 var $author$project$Main$Kill = {$: 'Kill'};
-var $author$project$Main$Planet = F7(
-	function (position, v, r, color, whenHit, tail, deadTails) {
-		return {color: color, deadTails: deadTails, position: position, r: r, tail: tail, v: v, whenHit: whenHit};
+var $author$project$Main$NoPlayer = {$: 'NoPlayer'};
+var $author$project$Main$Planet = F8(
+	function (isPlayer, position, v, r, color, whenHit, tail, deadTails) {
+		return {color: color, deadTails: deadTails, isPlayer: isPlayer, position: position, r: r, tail: tail, v: v, whenHit: whenHit};
 	});
 var $author$project$Main$Split = {$: 'Split'};
 var $elm$random$Random$constant = function (value) {
@@ -7370,7 +7372,7 @@ var $avh4$elm_color$Color$rgb255 = F3(
 			1.0);
 	});
 var $author$project$Main$randomColor = function () {
-	var component = A2($elm$random$Random$int, 0, 255);
+	var component = A2($elm$random$Random$int, 30, 250);
 	return A4($elm$random$Random$map3, $avh4$elm_color$Color$rgb255, component, component, component);
 }();
 var $elm$random$Random$addOne = function (value) {
@@ -7452,7 +7454,7 @@ var $author$project$Main$randomPlanet = function (_v0) {
 			$elm$random$Random$constant(_List_Nil),
 			A6(
 				$elm$random$Random$map5,
-				$author$project$Main$Planet,
+				$author$project$Main$Planet($author$project$Main$NoPlayer),
 				A2(
 					$elm$random$Random$map,
 					A2($lue_bird$elm_xy$Xy$map2, $elm$core$Basics$add, awayFrom),
@@ -7549,6 +7551,7 @@ var $author$project$Main$init = _Utils_Tuple3(
 					{
 						color: A3($avh4$elm_color$Color$rgb, 1, 1, 0),
 						deadTails: _List_Nil,
+						isPlayer: $author$project$Main$Player,
 						position: $lue_bird$elm_xy$Xy$zero,
 						r: 2.2,
 						tail: _List_Nil,
@@ -8024,15 +8027,6 @@ var $author$project$Main$subscriptions = F2(
 				]));
 	});
 var $author$project$Main$GameOver = {$: 'GameOver'};
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
 var $ohanhi$keyboard$Keyboard$ArrowDown = {$: 'ArrowDown'};
 var $ohanhi$keyboard$Keyboard$ArrowLeft = {$: 'ArrowLeft'};
 var $ohanhi$keyboard$Keyboard$ArrowRight = {$: 'ArrowRight'};
@@ -8136,7 +8130,15 @@ var $turboMaCk$non_empty_list_alias$List$NonEmpty$filter = function (f) {
 var $lue_bird$elm_xy$Xy$fromXY = function (record) {
 	return A2($lue_bird$elm_xy$Xy$xy, record.x, record.y);
 };
-var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $turboMaCk$non_empty_list_alias$List$NonEmpty$head = function (_v0) {
 	var h = _v0.a;
 	return h;
@@ -8154,10 +8156,6 @@ var $turboMaCk$non_empty_list_alias$List$NonEmpty$indexedMap = F2(
 				},
 				t));
 	});
-var $turboMaCk$non_empty_list_alias$List$NonEmpty$length = function (_v0) {
-	var t = _v0.b;
-	return $elm$core$List$length(t) + 1;
-};
 var $author$project$Main$lengthAtMost = F2(
 	function (maximumLength, xy) {
 		var length_ = $author$project$Main$length(xy);
@@ -8217,17 +8215,6 @@ var $elm$core$List$maximum = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $turboMaCk$non_empty_list_alias$List$NonEmpty$maximum = function (ne) {
-	var h = ne.a;
-	var _v0 = $elm$core$List$maximum(
-		$turboMaCk$non_empty_list_alias$List$NonEmpty$toList(ne));
-	if (_v0.$ === 'Just') {
-		var x = _v0.a;
-		return x;
-	} else {
-		return h;
-	}
-};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$player = $turboMaCk$non_empty_list_alias$List$NonEmpty$head;
@@ -8247,7 +8234,6 @@ var $elm_community$list_extra$List$Extra$removeAt = F2(
 			}
 		}
 	});
-var $turboMaCk$non_empty_list_alias$List$NonEmpty$sum = A2($elm$core$Basics$composeL, $elm$core$List$sum, $turboMaCk$non_empty_list_alias$List$NonEmpty$toList);
 var $elm$core$Basics$atan2 = _Basics_atan2;
 var $lue_bird$elm_xy$Xy$toAngle = function (direction_) {
 	return A2(
@@ -8828,209 +8814,226 @@ var $author$project$Main$update = F2(
 									overlap(planet),
 									others));
 						};
-						var collide = function (planets) {
-							var planet = $turboMaCk$non_empty_list_alias$List$NonEmpty$head(planets);
-							return function (overlapping) {
-								return A2(
-									$elm$core$Maybe$withDefault,
-									overlapping,
-									A2(
-										$elm$core$Maybe$map,
-										A2(
-											$elm$core$Basics$composeR,
-											collide,
-											function (planets_) {
-												return _Utils_ap(overlapping, planets_);
-											}),
-										A2(
-											$turboMaCk$non_empty_list_alias$List$NonEmpty$filter,
-											A2(
-												$elm$core$Basics$composeL,
-												$elm$core$Basics$not,
-												overlap(planet)),
-											planets)));
-							}(
-								A2(
-									$elm$core$Maybe$withDefault,
-									_List_fromArray(
-										[planet]),
-									A2(
-										$elm$core$Maybe$map,
-										function (overlapping) {
-											var sum = function (aspect) {
-												return A2(
-													$elm$core$Basics$composeR,
-													$elm$core$List$map(aspect),
-													$elm$core$List$sum);
-											};
-											var splitters = A2(
-												$elm$core$List$filter,
-												A2(
-													$elm$core$Basics$composeR,
-													function ($) {
-														return $.whenHit;
-													},
-													$elm$core$Basics$eq($author$project$Main$Split)),
-												$turboMaCk$non_empty_list_alias$List$NonEmpty$toList(overlapping));
-											var splitCount = $elm$core$List$length(splitters) + 1;
-											var killerCount = $elm$core$List$length(
-												A2(
-													$elm$core$List$filter,
-													A2(
-														$elm$core$Basics$composeR,
-														function ($) {
-															return $.whenHit;
-														},
-														$elm$core$Basics$eq($author$project$Main$Kill)),
-													$turboMaCk$non_empty_list_alias$List$NonEmpty$toList(overlapping)));
-											var joiners = A2(
-												$elm$core$List$filter,
-												A2(
-													$elm$core$Basics$composeR,
-													function ($) {
-														return $.whenHit;
-													},
-													$elm$core$Basics$eq($author$project$Main$Join)),
-												$turboMaCk$non_empty_list_alias$List$NonEmpty$toList(overlapping));
-											var componentAvg = function (component) {
-												return $turboMaCk$non_empty_list_alias$List$NonEmpty$sum(
-													A2(
-														$turboMaCk$non_empty_list_alias$List$NonEmpty$map,
-														function (_v7) {
-															var r = _v7.r;
-															var color = _v7.color;
-															return r * component(
-																$avh4$elm_color$Color$toRgba(color));
-														},
-														overlapping)) / A2(
-													sum,
-													function ($) {
-														return $.r;
-													},
-													joiners);
-											};
-											var biggestR = $turboMaCk$non_empty_list_alias$List$NonEmpty$maximum(
-												A2(
-													$turboMaCk$non_empty_list_alias$List$NonEmpty$map,
-													function ($) {
-														return $.r;
-													},
-													overlapping));
-											var biggest = A2(
-												$elm$core$Maybe$withDefault,
-												planet,
-												A2(
-													$elm$core$Maybe$map,
-													$turboMaCk$non_empty_list_alias$List$NonEmpty$head,
-													A2(
-														$turboMaCk$non_empty_list_alias$List$NonEmpty$filter,
-														A2(
-															$elm$core$Basics$composeR,
-															function ($) {
-																return $.r;
-															},
-															$elm$core$Basics$eq(biggestR)),
-														overlapping)));
-											var splitPlanet = function (_v6) {
-												var v = _v6.v;
-												var position = _v6.position;
-												return {
-													color: A3(
-														$avh4$elm_color$Color$rgb,
-														componentAvg(
-															function ($) {
-																return $.red;
-															}),
-														componentAvg(
-															function ($) {
-																return $.green;
-															}),
-														componentAvg(
-															function ($) {
-																return $.blue;
-															})),
-													deadTails: biggest.deadTails,
-													position: position,
-													r: $author$project$Main$massToR(
-														A2(sum, $author$project$Main$mass, joiners) / splitCount),
-													tail: biggest.tail,
-													v: v,
-													whenHit: $author$project$Main$Join
-												};
-											};
-											var avg = F2(
-												function (aspect, list) {
-													return A2(sum, aspect, list) / $elm$core$List$length(list);
-												});
-											return (killerCount > 0) ? _List_Nil : ((splitCount === 1) ? _List_fromArray(
-												[planet]) : A2(
-												$elm$core$List$map,
-												function (i) {
-													return splitPlanet(
-														{
-															position: A3(
-																$lue_bird$elm_xy$Xy$map2,
-																$elm$core$Basics$add,
-																A2(
-																	$lue_bird$elm_xy$Xy$map,
-																	$elm$core$Basics$mul(
-																		A2(
-																			sum,
-																			function ($) {
-																				return $.r;
-																			},
-																			joiners)),
-																	$lue_bird$elm_xy$Xy$direction(
-																		$elm$core$Basics$turns((i + 1) / splitCount))),
-																biggest.position),
-															v: function () {
-																var splitAngle = $lue_bird$elm_xy$Xy$toAngle(
-																	A2(
-																		$lue_bird$elm_xy$Xy$map,
-																		function (aspect) {
-																			return A2(avg, aspect, splitters);
-																		},
-																		_Utils_Tuple2(
-																			A2(
-																				$elm$core$Basics$composeR,
-																				function ($) {
-																					return $.v;
-																				},
-																				$lue_bird$elm_xy$Xy$x),
-																			A2(
-																				$elm$core$Basics$composeR,
-																				function ($) {
-																					return $.v;
-																				},
-																				$lue_bird$elm_xy$Xy$y))));
-																return A2(
-																	$lue_bird$elm_xy$Xy$map,
-																	$elm$core$Basics$mul(5.3),
-																	$lue_bird$elm_xy$Xy$direction(
-																		(splitAngle + $elm$core$Basics$turns(1 / 4)) + $elm$core$Basics$turns((i + 1) / splitCount)));
-															}()
-														});
-												},
-												A2($elm$core$List$range, 0, splitCount - 1)));
-										},
-										A2(
-											$elm$core$Maybe$andThen,
-											function (overlapping) {
-												return ($turboMaCk$non_empty_list_alias$List$NonEmpty$length(overlapping) >= 2) ? $elm$core$Maybe$Just(overlapping) : $elm$core$Maybe$Nothing;
-											},
-											A2(
-												$turboMaCk$non_empty_list_alias$List$NonEmpty$filter,
-												overlap(planet),
-												planets)))));
-						};
 						var arrows = A2(
 							$lue_bird$elm_xy$Xy$map,
 							$elm$core$Basics$toFloat,
 							$lue_bird$elm_xy$Xy$fromXY(
 								$ohanhi$keyboard$Keyboard$Arrows$arrows(model.pressedKeys)));
-						var _v8 = playing.planets;
-						var player_ = _v8.a;
-						var nonPlayerPlanets = _v8.b;
+						var _v6 = playing.planets;
+						var player_ = _v6.a;
+						var nonPlayerPlanets = _v6.b;
+						var collide = function (planets) {
+							var planet = $turboMaCk$non_empty_list_alias$List$NonEmpty$head(planets);
+							var overlapping = A2(
+								$elm$core$List$filter,
+								overlap(planet),
+								$turboMaCk$non_empty_list_alias$List$NonEmpty$toList(planets));
+							var newPlanets = function () {
+								if (overlapping.b && overlapping.b.b) {
+									var overlap0 = overlapping.a;
+									var _v8 = overlapping.b;
+									var overlap1 = _v8.a;
+									var splitters = A2(
+										$elm$core$List$filter,
+										A2(
+											$elm$core$Basics$composeR,
+											function ($) {
+												return $.whenHit;
+											},
+											$elm$core$Basics$eq($author$project$Main$Split)),
+										overlapping);
+									var splitCount = $elm$core$List$length(splitters) + 1;
+									var killerCount = $elm$core$List$length(
+										A2(
+											$elm$core$List$filter,
+											A2(
+												$elm$core$Basics$composeR,
+												function ($) {
+													return $.whenHit;
+												},
+												$elm$core$Basics$eq($author$project$Main$Kill)),
+											overlapping));
+									var joiners = A2(
+										$elm$core$List$filter,
+										A2(
+											$elm$core$Basics$composeR,
+											function ($) {
+												return $.whenHit;
+											},
+											$elm$core$Basics$eq($author$project$Main$Join)),
+										overlapping);
+									var rSum = $elm$core$List$sum(
+										A2(
+											$elm$core$List$map,
+											function ($) {
+												return $.r;
+											},
+											joiners));
+									var joinerCount = $elm$core$List$length(joiners);
+									var componentAvg = function (component) {
+										return $elm$core$List$sum(
+											A2(
+												$elm$core$List$map,
+												function (_v10) {
+													var r = _v10.r;
+													var color = _v10.color;
+													return r * component(
+														$avh4$elm_color$Color$toRgba(color));
+												},
+												joiners)) / rSum;
+									};
+									var biggestR = A2(
+										$elm$core$Maybe$withDefault,
+										0,
+										$elm$core$List$maximum(
+											A2(
+												$elm$core$List$map,
+												function ($) {
+													return $.r;
+												},
+												joiners)));
+									var biggest = A2(
+										$elm$core$Maybe$withDefault,
+										planet,
+										$elm$core$List$head(
+											A2(
+												$elm$core$List$filter,
+												A2(
+													$elm$core$Basics$composeR,
+													function ($) {
+														return $.r;
+													},
+													$elm$core$Basics$eq(biggestR)),
+												overlapping)));
+									var newPlanet = function (_v9) {
+										var v = _v9.v;
+										var position = _v9.position;
+										return {
+											color: A3(
+												$avh4$elm_color$Color$rgb,
+												componentAvg(
+													function ($) {
+														return $.red;
+													}),
+												componentAvg(
+													function ($) {
+														return $.green;
+													}),
+												componentAvg(
+													function ($) {
+														return $.blue;
+													})),
+											deadTails: biggest.deadTails,
+											isPlayer: A2(
+												$elm$core$Maybe$withDefault,
+												player_,
+												$elm$core$List$head(overlapping)).isPlayer,
+											position: position,
+											r: $author$project$Main$massToR(
+												$elm$core$List$sum(
+													A2($elm$core$List$map, $author$project$Main$mass, joiners)) / splitCount),
+											tail: biggest.tail,
+											v: v,
+											whenHit: $author$project$Main$Join
+										};
+									};
+									var avg = F2(
+										function (aspect, list) {
+											return $elm$core$List$sum(
+												A2($elm$core$List$map, aspect, list)) / $elm$core$List$length(list);
+										});
+									return (killerCount > 0) ? _List_Nil : ((splitCount === 1) ? A2(
+										$elm$core$List$cons,
+										newPlanet(
+											{
+												position: biggest.position,
+												v: A2(
+													$lue_bird$elm_xy$Xy$map,
+													function (aspect) {
+														return $elm$core$List$sum(
+															A2($elm$core$List$map, aspect, joiners));
+													},
+													_Utils_Tuple2(
+														A2(
+															$elm$core$Basics$composeR,
+															function ($) {
+																return $.v;
+															},
+															$lue_bird$elm_xy$Xy$x),
+														A2(
+															$elm$core$Basics$composeR,
+															function ($) {
+																return $.v;
+															},
+															$lue_bird$elm_xy$Xy$y)))
+											}),
+										_List_Nil) : A2(
+										$elm$core$List$map,
+										function (i) {
+											return newPlanet(
+												{
+													position: A3(
+														$lue_bird$elm_xy$Xy$map2,
+														$elm$core$Basics$add,
+														A2(
+															$lue_bird$elm_xy$Xy$map,
+															$elm$core$Basics$mul(rSum),
+															$lue_bird$elm_xy$Xy$direction(
+																$elm$core$Basics$turns((i + 1) / splitCount))),
+														biggest.position),
+													v: function () {
+														var splitAngle = $lue_bird$elm_xy$Xy$toAngle(
+															A2(
+																$lue_bird$elm_xy$Xy$map,
+																function (aspect) {
+																	return A2(avg, aspect, splitters);
+																},
+																_Utils_Tuple2(
+																	A2(
+																		$elm$core$Basics$composeR,
+																		function ($) {
+																			return $.v;
+																		},
+																		$lue_bird$elm_xy$Xy$x),
+																	A2(
+																		$elm$core$Basics$composeR,
+																		function ($) {
+																			return $.v;
+																		},
+																		$lue_bird$elm_xy$Xy$y))));
+														return A2(
+															$lue_bird$elm_xy$Xy$map,
+															$elm$core$Basics$mul(5.3),
+															$lue_bird$elm_xy$Xy$direction(
+																(splitAngle + $elm$core$Basics$turns(1 / 4)) + $elm$core$Basics$turns((i + 1) / splitCount)));
+													}()
+												});
+										},
+										A2($elm$core$List$range, 0, splitCount - 1)));
+								} else {
+									return _List_fromArray(
+										[planet]);
+								}
+							}();
+							return A2(
+								$elm$core$Maybe$withDefault,
+								newPlanets,
+								A2(
+									$elm$core$Maybe$map,
+									A2(
+										$elm$core$Basics$composeR,
+										collide,
+										function (planets_) {
+											return _Utils_ap(newPlanets, planets_);
+										}),
+									A2(
+										$turboMaCk$non_empty_list_alias$List$NonEmpty$filter,
+										A2(
+											$elm$core$Basics$composeL,
+											$elm$core$Basics$not,
+											overlap(planet)),
+										planets)));
+						};
 						var planetsUpdatedPlayer = _Utils_Tuple2(
 							A2(
 								$author$project$Main$mapV,
@@ -9049,16 +9052,16 @@ var $author$project$Main$update = F2(
 							planetsWithGravity(planetsUpdatedPlayer));
 						var newExplosions = A2(
 							$elm$core$List$map,
-							function (_v13) {
-								var r = _v13.r;
-								var position = _v13.position;
-								var color = _v13.color;
+							function (_v16) {
+								var r = _v16.r;
+								var position = _v16.position;
+								var color = _v16.color;
 								return {color: color, position: position, r: r};
 							},
 							overlaps(planetsMoved));
-						var _v9 = planetsMoved;
-						var movedPlayer = _v9.a;
-						var movedPlanets = _v9.b;
+						var _v11 = planetsMoved;
+						var movedPlayer = _v11.a;
+						var movedPlanets = _v11.b;
 						var collidedPlanets = collide(
 							updateTail(
 								_Utils_Tuple2(
@@ -9077,28 +9080,33 @@ var $author$project$Main$update = F2(
 										if (collidedPlanets.b) {
 											var head = collidedPlanets.a;
 											var tail = collidedPlanets.b;
-											return _Utils_eq(head.position, movedPlayer.position) ? $author$project$Main$Playing(
-												_Utils_update(
-													playing,
-													{
-														explosions: _Utils_ap(
-															newExplosions,
-															A2(
-																$elm$core$List$filter,
-																function (_v11) {
-																	var r = _v11.r;
-																	return r < 120;
-																},
+											var _v13 = head.isPlayer;
+											if (_v13.$ === 'Player') {
+												return $author$project$Main$Playing(
+													_Utils_update(
+														playing,
+														{
+															explosions: _Utils_ap(
+																newExplosions,
 																A2(
-																	$elm$core$List$map,
-																	function (ex) {
-																		return _Utils_update(
-																			ex,
-																			{r: ex.r + 3});
+																	$elm$core$List$filter,
+																	function (_v14) {
+																		var r = _v14.r;
+																		return r < 120;
 																	},
-																	playing.explosions))),
-														planets: _Utils_Tuple2(head, tail)
-													})) : $author$project$Main$GameOver;
+																	A2(
+																		$elm$core$List$map,
+																		function (ex) {
+																			return _Utils_update(
+																				ex,
+																				{r: ex.r + 3});
+																		},
+																		playing.explosions))),
+															planets: _Utils_Tuple2(head, tail)
+														}));
+											} else {
+												return $author$project$Main$GameOver;
+											}
 										} else {
 											return $author$project$Main$GameOver;
 										}
@@ -9154,12 +9162,12 @@ var $author$project$Main$update = F2(
 							model,
 							{
 								gameStage: function () {
-									var _v14 = model.gameStage;
-									if (_v14.$ === 'Playing') {
-										var playing = _v14.a;
-										var _v15 = playing.planets;
-										var player_ = _v15.a;
-										var tail = _v15.b;
+									var _v17 = model.gameStage;
+									if (_v17.$ === 'Playing') {
+										var playing = _v17.a;
+										var _v18 = playing.planets;
+										var player_ = _v18.a;
+										var tail = _v18.b;
 										return $author$project$Main$Playing(
 											_Utils_update(
 												playing,
@@ -9181,9 +9189,9 @@ var $author$project$Main$update = F2(
 				return function (model) {
 					return _Utils_Tuple3(
 						function () {
-							var _v16 = model.gameStage;
-							if (_v16.$ === 'Playing') {
-								var playing = _v16.a;
+							var _v19 = model.gameStage;
+							if (_v19.$ === 'Playing') {
+								var playing = _v19.a;
 								return _Utils_update(
 									model,
 									{
@@ -13683,6 +13691,7 @@ var $mdgriffith$elm_ui$Internal$Model$renderWidth = function (w) {
 	}
 };
 var $mdgriffith$elm_ui$Internal$Flag$borderWidth = $mdgriffith$elm_ui$Internal$Flag$flag(27);
+var $elm$core$Basics$ge = _Utils_ge;
 var $mdgriffith$elm_ui$Internal$Model$skippable = F2(
 	function (flag, style) {
 		if (_Utils_eq(flag, $mdgriffith$elm_ui$Internal$Flag$borderWidth)) {

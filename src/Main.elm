@@ -64,7 +64,8 @@ type GameStage
 
 
 type alias Planet =
-    { position : Xy Float
+    { isPlayer : PlanetRole
+    , position : Xy Float
     , v : Xy Float
     , r : Float
     , color : Color
@@ -72,6 +73,11 @@ type alias Planet =
     , tail : List (Xy Float)
     , deadTails : List (List (Xy Float))
     }
+
+
+type PlanetRole
+    = Player
+    | NoPlayer
 
 
 type ActionWhenHit
@@ -136,7 +142,8 @@ init =
       , pressedKeys = []
       , gameStage =
             { planets =
-                { v = Xy.zero
+                { isPlayer = Player
+                , v = Xy.zero
                 , position = Xy.zero
                 , r = 2.2
                 , color = rgb 1 1 0
@@ -283,137 +290,150 @@ update _ msg =
                                 let
                                     planet =
                                         planets |> List.NonEmpty.head
+
+                                    overlapping =
+                                        planets
+                                            |> List.NonEmpty.toList
+                                            |> List.filter (overlap planet)
+
+                                    newPlanets =
+                                        case overlapping of
+                                            overlap0 :: overlap1 :: _ ->
+                                                let
+                                                    avg aspect list =
+                                                        (list |> List.map aspect |> List.sum)
+                                                            / (List.length list
+                                                                |> toFloat
+                                                              )
+
+                                                    componentAvg component =
+                                                        (joiners
+                                                            |> List.map
+                                                                (\{ r, color } ->
+                                                                    color |> Color.toRgba |> component |> (*) r
+                                                                )
+                                                            |> List.sum
+                                                        )
+                                                            / rSum
+
+                                                    rSum =
+                                                        List.map .r joiners |> List.sum
+
+                                                    biggestR =
+                                                        joiners
+                                                            |> List.map .r
+                                                            |> List.maximum
+                                                            -- never
+                                                            |> Maybe.withDefault 0
+
+                                                    biggest =
+                                                        overlapping
+                                                            |> List.filter
+                                                                (.r >> (==) biggestR)
+                                                            |> List.head
+                                                            |> Maybe.withDefault planet
+
+                                                    joiners =
+                                                        overlapping
+                                                            |> List.filter (.whenHit >> (==) Join)
+
+                                                    joinerCount =
+                                                        joiners |> List.length
+
+                                                    splitters =
+                                                        overlapping
+                                                            |> List.filter (.whenHit >> (==) Split)
+
+                                                    splitCount =
+                                                        (splitters |> List.length) + 1
+
+                                                    newPlanet { v, position } =
+                                                        { isPlayer =
+                                                            overlapping
+                                                                |> List.head
+                                                                -- never
+                                                                |> Maybe.withDefault player_
+                                                                |> .isPlayer
+                                                        , position = position
+                                                        , color =
+                                                            rgb (componentAvg .red)
+                                                                (componentAvg .green)
+                                                                (componentAvg .blue)
+                                                        , v = v
+                                                        , r =
+                                                            (List.map mass joiners |> List.sum)
+                                                                / toFloat splitCount
+                                                                |> massToR
+                                                        , whenHit = Join
+                                                        , tail = biggest.tail
+                                                        , deadTails = biggest.deadTails
+                                                        }
+
+                                                    killerCount =
+                                                        overlapping
+                                                            |> List.filter (.whenHit >> (==) Kill)
+                                                            |> List.length
+                                                in
+                                                if killerCount > 0 then
+                                                    []
+
+                                                else if splitCount == 1 then
+                                                    newPlanet
+                                                        { v =
+                                                            ( .v >> Xy.x, .v >> Xy.y )
+                                                                |> Xy.map
+                                                                    (\aspect ->
+                                                                        List.map aspect joiners
+                                                                            |> List.sum
+                                                                    )
+                                                        , position = biggest.position
+                                                        }
+                                                        :: []
+
+                                                else
+                                                    List.range 0 (splitCount - 1)
+                                                        |> List.map
+                                                            (\i ->
+                                                                newPlanet
+                                                                    { v =
+                                                                        let
+                                                                            splitAngle =
+                                                                                ( .v >> Xy.x, .v >> Xy.y )
+                                                                                    |> Xy.map
+                                                                                        (\aspect -> avg aspect splitters)
+                                                                                    |> Xy.toAngle
+                                                                        in
+                                                                        Xy.direction
+                                                                            (splitAngle
+                                                                                + turns (1 / 4)
+                                                                                + turns
+                                                                                    ((toFloat i + 1) / toFloat splitCount)
+                                                                            )
+                                                                            |> Xy.map ((*) 5.3)
+                                                                    , position =
+                                                                        biggest.position
+                                                                            |> Xy.map2 (+)
+                                                                                (Xy.direction
+                                                                                    (turns
+                                                                                        ((toFloat i + 1) / toFloat splitCount)
+                                                                                    )
+                                                                                    |> Xy.map ((*) rSum)
+                                                                                )
+                                                                    }
+                                                            )
+
+                                            _ ->
+                                                [ planet ]
                                 in
                                 planets
-                                    |> List.NonEmpty.filter (overlap planet)
-                                    |> Maybe.andThen
-                                        (\overlapping ->
-                                            if (overlapping |> List.NonEmpty.length) >= 2 then
-                                                Just overlapping
-
-                                            else
-                                                Nothing
-                                        )
+                                    |> List.NonEmpty.filter (not << overlap planet)
                                     |> Maybe.map
-                                        (\overlapping ->
-                                            let
-                                                sum aspect =
-                                                    List.map aspect
-                                                        >> List.sum
-
-                                                avg aspect list =
-                                                    sum aspect list
-                                                        / (List.length list
-                                                            |> toFloat
-                                                          )
-
-                                                componentAvg component =
-                                                    (overlapping
-                                                        |> List.NonEmpty.map
-                                                            (\{ r, color } ->
-                                                                color |> Color.toRgba |> component |> (*) r
-                                                            )
-                                                        |> List.NonEmpty.sum
-                                                    )
-                                                        / sum .r joiners
-
-                                                biggestR =
-                                                    overlapping
-                                                        |> List.NonEmpty.map .r
-                                                        |> List.NonEmpty.maximum
-
-                                                biggest =
-                                                    overlapping
-                                                        |> List.NonEmpty.filter
-                                                            (.r >> (==) biggestR)
-                                                        |> Maybe.map List.NonEmpty.head
-                                                        |> Maybe.withDefault planet
-
-                                                joiners =
-                                                    overlapping
-                                                        |> List.NonEmpty.toList
-                                                        |> List.filter (.whenHit >> (==) Join)
-
-                                                splitters =
-                                                    overlapping
-                                                        |> List.NonEmpty.toList
-                                                        |> List.filter (.whenHit >> (==) Split)
-
-                                                splitCount =
-                                                    (splitters |> List.length) + 1
-
-                                                splitPlanet { v, position } =
-                                                    { position = position
-                                                    , color =
-                                                        rgb (componentAvg .red)
-                                                            (componentAvg .green)
-                                                            (componentAvg .blue)
-                                                    , v = v
-                                                    , r =
-                                                        sum mass joiners
-                                                            / toFloat splitCount
-                                                            |> massToR
-                                                    , whenHit = Join
-                                                    , tail = biggest.tail
-                                                    , deadTails = biggest.deadTails
-                                                    }
-
-                                                killerCount =
-                                                    overlapping
-                                                        |> List.NonEmpty.toList
-                                                        |> List.filter (.whenHit >> (==) Kill)
-                                                        |> List.length
-                                            in
-                                            if killerCount > 0 then
-                                                []
-
-                                            else if splitCount == 1 then
-                                                [ planet ]
-
-                                            else
-                                                List.range 0 (splitCount - 1)
-                                                    |> List.map
-                                                        (\i ->
-                                                            splitPlanet
-                                                                { v =
-                                                                    let
-                                                                        splitAngle =
-                                                                            ( .v >> Xy.x, .v >> Xy.y )
-                                                                                |> Xy.map
-                                                                                    (\aspect -> avg aspect splitters)
-                                                                                |> Xy.toAngle
-                                                                    in
-                                                                    Xy.direction
-                                                                        (splitAngle
-                                                                            + turns (1 / 4)
-                                                                            + turns
-                                                                                ((toFloat i + 1) / toFloat splitCount)
-                                                                        )
-                                                                        |> Xy.map ((*) 5.3)
-                                                                , position =
-                                                                    biggest.position
-                                                                        |> Xy.map2 (+)
-                                                                            (Xy.direction
-                                                                                (turns
-                                                                                    ((toFloat i + 1) / toFloat splitCount)
-                                                                                )
-                                                                                |> Xy.map ((*) (sum .r joiners))
-                                                                            )
-                                                                }
-                                                        )
+                                        (collide
+                                            >> (\planets_ ->
+                                                    newPlanets ++ planets_
+                                               )
                                         )
-                                    |> Maybe.withDefault [ planet ]
-                                    |> (\overlapping ->
-                                            planets
-                                                |> List.NonEmpty.filter (not << overlap planet)
-                                                |> Maybe.map
-                                                    (collide
-                                                        >> (\planets_ ->
-                                                                overlapping ++ planets_
-                                                           )
-                                                    )
-                                                |> Maybe.withDefault overlapping
-                                       )
+                                    |> Maybe.withDefault newPlanets
 
                             collidedPlanets =
                                 ( movedPlayer
@@ -449,19 +469,20 @@ update _ msg =
                             | gameStage =
                                 case collidedPlanets of
                                     head :: tail ->
-                                        if head.position == movedPlayer.position then
-                                            { playing
-                                                | planets = ( head, tail )
-                                                , explosions =
-                                                    playing.explosions
-                                                        |> List.map (\ex -> { ex | r = ex.r + 3 })
-                                                        |> List.filter (\{ r } -> r < 120)
-                                                        |> (++) newExplosions
-                                            }
-                                                |> Playing
+                                        case head.isPlayer of
+                                            Player ->
+                                                { playing
+                                                    | planets = ( head, tail )
+                                                    , explosions =
+                                                        playing.explosions
+                                                            |> List.map (\ex -> { ex | r = ex.r + 3 })
+                                                            |> List.filter (\{ r } -> r < 120)
+                                                            |> (++) newExplosions
+                                                }
+                                                    |> Playing
 
-                                        else
-                                            GameOver
+                                            NoPlayer ->
+                                                GameOver
 
                                     [] ->
                                         GameOver
@@ -572,7 +593,7 @@ randomPlanet :
     { awayFrom : Xy Float, atLeast : Float }
     -> Random.Generator Planet
 randomPlanet { awayFrom, atLeast } =
-    Random.map5 Planet
+    Random.map5 (Planet NoPlayer)
         (Random.map2 xy
             (Random.float atLeast 200 |> randomSign)
             (Random.float atLeast 200 |> randomSign)
@@ -600,7 +621,7 @@ randomColor : Random.Generator Color
 randomColor =
     let
         component =
-            Random.int 0 255
+            Random.int 30 250
     in
     Random.map3 rgb255 component component component
 

@@ -8715,6 +8715,10 @@ var $elm$core$Maybe$withDefault = F2(
 var $author$project$Main$update = F2(
 	function (_v0, msg) {
 		switch (msg.$) {
+			case 'NewGameClicked':
+				return function (_v2) {
+					return $author$project$Main$init;
+				};
 			case 'Resized':
 				var windowSize = msg.a;
 				return function (m) {
@@ -8735,9 +8739,9 @@ var $author$project$Main$update = F2(
 			case 'Frame':
 				var millis = msg.a;
 				return function (model) {
-					var _v2 = model.gameStage;
-					if (_v2.$ === 'Playing') {
-						var playing = _v2.a;
+					var _v3 = model.gameStage;
+					if (_v3.$ === 'Playing') {
+						var playing = _v3.a;
 						var updateTail = $turboMaCk$non_empty_list_alias$List$NonEmpty$map(
 							function (planet) {
 								return _Utils_update(
@@ -8798,21 +8802,21 @@ var $author$project$Main$update = F2(
 									A2($author$project$Main$distance, planet, other),
 									A2($elm$core$Basics$max, planet.r, other.r)) < 0;
 							});
-						var overlaps = function (_v3) {
-							var planet = _v3.a;
-							var others = _v3.b;
+						var overlaps = function (_v4) {
+							var planet = _v4.a;
+							var others = _v4.b;
 							return _Utils_ap(
 								function () {
-									var _v4 = A2(
+									var _v5 = A2(
 										$elm$core$List$filter,
 										A2(
 											$elm$core$Basics$composeL,
 											$elm$core$Basics$not,
 											overlap(planet)),
 										others);
-									if (_v4.b) {
-										var head = _v4.a;
-										var tail = _v4.b;
+									if (_v5.b) {
+										var head = _v5.a;
+										var tail = _v5.b;
 										return overlaps(
 											_Utils_Tuple2(head, tail));
 									} else {
@@ -8892,9 +8896,9 @@ var $author$project$Main$update = F2(
 												return $turboMaCk$non_empty_list_alias$List$NonEmpty$sum(
 													A2(
 														$turboMaCk$non_empty_list_alias$List$NonEmpty$map,
-														function (_v6) {
-															var r = _v6.r;
-															var color = _v6.color;
+														function (_v7) {
+															var r = _v7.r;
+															var color = _v7.color;
 															return r * component(
 																$avh4$elm_color$Color$toRgba(color));
 														},
@@ -8927,9 +8931,9 @@ var $author$project$Main$update = F2(
 															},
 															$elm$core$Basics$eq(biggestR)),
 														overlapping)));
-											var splitPlanet = function (_v5) {
-												var v = _v5.v;
-												var position = _v5.position;
+											var splitPlanet = function (_v6) {
+												var v = _v6.v;
+												var position = _v6.position;
 												return {
 													color: A3(
 														$avh4$elm_color$Color$rgb,
@@ -9024,9 +9028,9 @@ var $author$project$Main$update = F2(
 							$elm$core$Basics$toFloat,
 							$lue_bird$elm_xy$Xy$fromXY(
 								$ohanhi$keyboard$Keyboard$Arrows$arrows(model.pressedKeys)));
-						var _v7 = playing.planets;
-						var player_ = _v7.a;
-						var nonPlayerPlanets = _v7.b;
+						var _v8 = playing.planets;
+						var player_ = _v8.a;
+						var nonPlayerPlanets = _v8.b;
 						var planetsUpdatedPlayer = _Utils_Tuple2(
 							A2(
 								$author$project$Main$mapV,
@@ -9045,16 +9049,16 @@ var $author$project$Main$update = F2(
 							planetsWithGravity(planetsUpdatedPlayer));
 						var newExplosions = A2(
 							$elm$core$List$map,
-							function (_v12) {
-								var r = _v12.r;
-								var position = _v12.position;
-								var color = _v12.color;
+							function (_v13) {
+								var r = _v13.r;
+								var position = _v13.position;
+								var color = _v13.color;
 								return {color: color, position: position, r: r};
 							},
 							overlaps(planetsMoved));
-						var _v8 = planetsMoved;
-						var movedPlayer = _v8.a;
-						var movedPlanets = _v8.b;
+						var _v9 = planetsMoved;
+						var movedPlayer = _v9.a;
+						var movedPlanets = _v9.b;
 						var collidedPlanets = collide(
 							updateTail(
 								_Utils_Tuple2(
@@ -9081,8 +9085,8 @@ var $author$project$Main$update = F2(
 															newExplosions,
 															A2(
 																$elm$core$List$filter,
-																function (_v10) {
-																	var r = _v10.r;
+																function (_v11) {
+																	var r = _v11.r;
 																	return r < 120;
 																},
 																A2(
@@ -9150,12 +9154,12 @@ var $author$project$Main$update = F2(
 							model,
 							{
 								gameStage: function () {
-									var _v13 = model.gameStage;
-									if (_v13.$ === 'Playing') {
-										var playing = _v13.a;
-										var _v14 = playing.planets;
-										var player_ = _v14.a;
-										var tail = _v14.b;
+									var _v14 = model.gameStage;
+									if (_v14.$ === 'Playing') {
+										var playing = _v14.a;
+										var _v15 = playing.planets;
+										var player_ = _v15.a;
+										var tail = _v15.b;
 										return $author$project$Main$Playing(
 											_Utils_update(
 												playing,
@@ -9177,9 +9181,9 @@ var $author$project$Main$update = F2(
 				return function (model) {
 					return _Utils_Tuple3(
 						function () {
-							var _v15 = model.gameStage;
-							if (_v15.$ === 'Playing') {
-								var playing = _v15.a;
+							var _v16 = model.gameStage;
+							if (_v16.$ === 'Playing') {
+								var playing = _v16.a;
 								return _Utils_update(
 									model,
 									{
@@ -9190,13 +9194,13 @@ var $author$project$Main$update = F2(
 													stars: function () {
 														var player_ = $author$project$Main$player(playing.planets);
 														return _Utils_ap(
+															newStars,
 															A2(
 																$elm$core$List$filter,
 																function (star) {
 																	return A2($author$project$Main$distance, star, player_) < 120;
 																},
-																playing.stars),
-															newStars);
+																playing.stars));
 													}()
 												}))
 									});
@@ -15914,6 +15918,151 @@ var $author$project$Main$view = F2(
 						$lue_bird$elm_xy$Xy$y(windowSize)))
 				]));
 	});
+var $author$project$Main$NewGameClicked = {$: 'NewGameClicked'};
+var $mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
+var $mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
+	return {$: 'Describe', a: a};
+};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $mdgriffith$elm_ui$Element$Input$enter = 'Enter';
+var $mdgriffith$elm_ui$Internal$Model$NoAttribute = {$: 'NoAttribute'};
+var $mdgriffith$elm_ui$Element$Input$hasFocusStyle = function (attr) {
+	if (((attr.$ === 'StyleClass') && (attr.b.$ === 'PseudoSelector')) && (attr.b.a.$ === 'Focus')) {
+		var _v1 = attr.b;
+		var _v2 = _v1.a;
+		return true;
+	} else {
+		return false;
+	}
+};
+var $mdgriffith$elm_ui$Element$Input$focusDefault = function (attrs) {
+	return A2($elm$core$List$any, $mdgriffith$elm_ui$Element$Input$hasFocusStyle, attrs) ? $mdgriffith$elm_ui$Internal$Model$NoAttribute : $mdgriffith$elm_ui$Internal$Model$htmlClass('focusable');
+};
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $mdgriffith$elm_ui$Element$Events$onClick = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Attr, $elm$html$Html$Events$onClick);
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var $elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var $mdgriffith$elm_ui$Element$Input$onKeyLookup = function (lookup) {
+	var decode = function (code) {
+		var _v0 = lookup(code);
+		if (_v0.$ === 'Nothing') {
+			return $elm$json$Json$Decode$fail('No key matched');
+		} else {
+			var msg = _v0.a;
+			return $elm$json$Json$Decode$succeed(msg);
+		}
+	};
+	var isKey = A2(
+		$elm$json$Json$Decode$andThen,
+		decode,
+		A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string));
+	return $mdgriffith$elm_ui$Internal$Model$Attr(
+		A2(
+			$elm$html$Html$Events$preventDefaultOn,
+			'keydown',
+			A2(
+				$elm$json$Json$Decode$map,
+				function (fired) {
+					return _Utils_Tuple2(fired, true);
+				},
+				isKey)));
+};
+var $mdgriffith$elm_ui$Internal$Model$Class = F2(
+	function (a, b) {
+		return {$: 'Class', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$cursor = $mdgriffith$elm_ui$Internal$Flag$flag(21);
+var $mdgriffith$elm_ui$Element$pointer = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$cursor, $mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
+var $mdgriffith$elm_ui$Internal$Model$Content = {$: 'Content'};
+var $mdgriffith$elm_ui$Element$shrink = $mdgriffith$elm_ui$Internal$Model$Content;
+var $mdgriffith$elm_ui$Element$Input$space = ' ';
+var $elm$html$Html$Attributes$tabindex = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'tabIndex',
+		$elm$core$String$fromInt(n));
+};
+var $mdgriffith$elm_ui$Internal$Model$Width = function (a) {
+	return {$: 'Width', a: a};
+};
+var $mdgriffith$elm_ui$Element$width = $mdgriffith$elm_ui$Internal$Model$Width;
+var $mdgriffith$elm_ui$Element$Input$button = F2(
+	function (attrs, _v0) {
+		var onPress = _v0.onPress;
+		var label = _v0.label;
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asEl,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
+					A2(
+						$elm$core$List$cons,
+						$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.contentCenterX + (' ' + ($mdgriffith$elm_ui$Internal$Style$classes.contentCenterY + (' ' + ($mdgriffith$elm_ui$Internal$Style$classes.seButton + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.noTextSelection)))))),
+						A2(
+							$elm$core$List$cons,
+							$mdgriffith$elm_ui$Element$pointer,
+							A2(
+								$elm$core$List$cons,
+								$mdgriffith$elm_ui$Element$Input$focusDefault(attrs),
+								A2(
+									$elm$core$List$cons,
+									$mdgriffith$elm_ui$Internal$Model$Describe($mdgriffith$elm_ui$Internal$Model$Button),
+									A2(
+										$elm$core$List$cons,
+										$mdgriffith$elm_ui$Internal$Model$Attr(
+											$elm$html$Html$Attributes$tabindex(0)),
+										function () {
+											if (onPress.$ === 'Nothing') {
+												return A2(
+													$elm$core$List$cons,
+													$mdgriffith$elm_ui$Internal$Model$Attr(
+														$elm$html$Html$Attributes$disabled(true)),
+													attrs);
+											} else {
+												var msg = onPress.a;
+												return A2(
+													$elm$core$List$cons,
+													$mdgriffith$elm_ui$Element$Events$onClick(msg),
+													A2(
+														$elm$core$List$cons,
+														$mdgriffith$elm_ui$Element$Input$onKeyLookup(
+															function (code) {
+																return _Utils_eq(code, $mdgriffith$elm_ui$Element$Input$enter) ? $elm$core$Maybe$Just(msg) : (_Utils_eq(code, $mdgriffith$elm_ui$Element$Input$space) ? $elm$core$Maybe$Just(msg) : $elm$core$Maybe$Nothing);
+															}),
+														attrs));
+											}
+										}()))))))),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[label])));
+	});
 var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 	return {$: 'AlignX', a: a};
 };
@@ -15934,28 +16083,25 @@ var $mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
 			'color',
 			fontColor));
 };
-var $mdgriffith$elm_ui$Internal$Model$Content = {$: 'Content'};
-var $mdgriffith$elm_ui$Element$shrink = $mdgriffith$elm_ui$Internal$Model$Content;
-var $mdgriffith$elm_ui$Internal$Model$Width = function (a) {
-	return {$: 'Width', a: a};
-};
-var $mdgriffith$elm_ui$Element$width = $mdgriffith$elm_ui$Internal$Model$Width;
-var $mdgriffith$elm_ui$Element$el = F2(
-	function (attrs, child) {
+var $mdgriffith$elm_ui$Internal$Model$AsColumn = {$: 'AsColumn'};
+var $mdgriffith$elm_ui$Internal$Model$asColumn = $mdgriffith$elm_ui$Internal$Model$AsColumn;
+var $mdgriffith$elm_ui$Element$column = F2(
+	function (attrs, children) {
 		return A4(
 			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asEl,
+			$mdgriffith$elm_ui$Internal$Model$asColumn,
 			$mdgriffith$elm_ui$Internal$Model$div,
 			A2(
 				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.contentTop + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.contentLeft)),
 				A2(
 					$elm$core$List$cons,
 					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
-					attrs)),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
-				_List_fromArray(
-					[child])));
+					A2(
+						$elm$core$List$cons,
+						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+						attrs))),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
 var $mdgriffith$elm_ui$Element$Font$size = function (i) {
 	return A2(
@@ -15970,7 +16116,7 @@ var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
 var $author$project$Main$viewGameOver = A2(
-	$mdgriffith$elm_ui$Element$el,
+	$mdgriffith$elm_ui$Element$column,
 	_List_fromArray(
 		[
 			$mdgriffith$elm_ui$Element$Font$size(50),
@@ -15979,7 +16125,17 @@ var $author$project$Main$viewGameOver = A2(
 			$mdgriffith$elm_ui$Element$centerX,
 			$mdgriffith$elm_ui$Element$centerY
 		]),
-	$mdgriffith$elm_ui$Element$text('Game over.\nReload the page and try again!'));
+	_List_fromArray(
+		[
+			$mdgriffith$elm_ui$Element$text('Game over.'),
+			A2(
+			$mdgriffith$elm_ui$Element$Input$button,
+			_List_Nil,
+			{
+				label: $mdgriffith$elm_ui$Element$text('Try again!'),
+				onPress: $elm$core$Maybe$Just($author$project$Main$NewGameClicked)
+			})
+		]));
 var $author$project$Main$viewDocument = F2(
 	function (_v0, model) {
 		return {

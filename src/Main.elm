@@ -16,6 +16,7 @@ import Color.Manipulate as Color
 import Element as Ui
 import Element.Background as Background
 import Element.Font as Font
+import Element.Input as UiInput
 import Html
 import Html.Attributes
 import Json.Decode
@@ -96,7 +97,10 @@ mapV map r =
     { r | v = map r.v }
 
 
-mapPosition : (pos -> pos) -> { r | position : pos } -> { r | position : pos }
+mapPosition :
+    (pos -> pos)
+    -> { r | position : pos }
+    -> { r | position : pos }
 mapPosition map r =
     { r | position = map r.position }
 
@@ -165,7 +169,8 @@ init =
 
 
 type Msg
-    = Resized (Xy Float)
+    = NewGameClicked
+    | Resized (Xy Float)
     | Frame Int
     | KeyMsg Keyboard.Msg
     | PlanetGenerated Planet
@@ -176,6 +181,9 @@ type Msg
 update : AudioData -> Msg -> Model -> ( Model, Cmd Msg, AudioCmd Msg )
 update _ msg =
     case msg of
+        NewGameClicked ->
+            \_ -> init
+
         Resized windowSize ->
             \m ->
                 ( { m
@@ -537,11 +545,10 @@ update _ msg =
                                             player_ =
                                                 player playing.planets
                                         in
-                                        (playing.stars
+                                        playing.stars
                                             |> List.filter
                                                 (\star -> distance star player_ < 120)
-                                        )
-                                            ++ newStars
+                                            |> (++) newStars
                                 }
                                     |> Playing
                         }
@@ -639,7 +646,7 @@ subscriptions _ _ =
         |> Sub.batch
 
 
-viewDocument : AudioData -> Model -> Browser.Document msg
+viewDocument : AudioData -> Model -> Browser.Document Msg
 viewDocument _ model =
     { title = "time to face gravity."
     , body =
@@ -666,10 +673,15 @@ viewDocument _ model =
     }
 
 
-viewGameOver : Ui.Element msg
+viewGameOver : Ui.Element Msg
 viewGameOver =
-    Ui.text "Game over.\nReload the page and try again!"
-        |> Ui.el
+    [ Ui.text "Game over."
+    , UiInput.button []
+        { label = Ui.text "Try again!"
+        , onPress = Just NewGameClicked
+        }
+    ]
+        |> Ui.column
             [ Font.size 50
             , Font.color (Ui.rgb 1 1 1)
             , Ui.centerX

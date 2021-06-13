@@ -9042,7 +9042,7 @@ var $author$project$Main$update = F2(
 									$elm$core$Basics$add,
 									A2(
 										$lue_bird$elm_xy$Xy$map,
-										$elm$core$Basics$mul(1.2),
+										$elm$core$Basics$mul(0.84),
 										arrows)),
 								player_),
 							nonPlayerPlanets);

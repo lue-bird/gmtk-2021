@@ -228,7 +228,7 @@ update _ msg =
                                 ( player_
                                     |> mapV
                                         (Xy.map2 (+)
-                                            (arrows |> Xy.map ((*) 1.2))
+                                            (arrows |> Xy.map ((*) 0.84))
                                         )
                                 , nonPlayerPlanets
                                 )

@@ -8874,7 +8874,7 @@ var $author$project$Main$update = F2(
 														function ($) {
 															return $.whenHit;
 														},
-														$elm$core$Basics$eq($author$project$Main$Split)),
+														$elm$core$Basics$eq($author$project$Main$Kill)),
 													$turboMaCk$non_empty_list_alias$List$NonEmpty$toList(overlapping)));
 											var joiners = A2(
 												$elm$core$List$filter,

@@ -676,16 +676,17 @@ viewDocument _ model =
 
 viewGameOver : Ui.Element Msg
 viewGameOver =
-    [ Ui.text "Game over."
+    [ Ui.text "Game over"
         |> Ui.el
             [ Font.size 50
             ]
     , UiInput.button
         [ Font.size 33
-        , Background.color (Ui.rgba 0 1 1 0.2)
+        , Background.color (Ui.rgba 0 1 1 0.1)
         , UiBorder.rounded 100
+        , Ui.padding 20
         ]
-        { label = Ui.text "Try again!"
+        { label = Ui.text "New game"
         , onPress = Just NewGameClicked
         }
     ]

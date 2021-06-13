@@ -16120,6 +16120,24 @@ var $mdgriffith$elm_ui$Element$el = F2(
 				_List_fromArray(
 					[child])));
 	});
+var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
+	function (a, b, c, d, e) {
+		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$padding = $mdgriffith$elm_ui$Internal$Flag$flag(2);
+var $mdgriffith$elm_ui$Element$padding = function (x) {
+	var f = x;
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + $elm$core$String$fromInt(x),
+			f,
+			f,
+			f,
+			f));
+};
 var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
 var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
 var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
@@ -16181,18 +16199,19 @@ var $author$project$Main$viewGameOver = A2(
 				[
 					$mdgriffith$elm_ui$Element$Font$size(50)
 				]),
-			$mdgriffith$elm_ui$Element$text('Game over.')),
+			$mdgriffith$elm_ui$Element$text('Game over')),
 			A2(
 			$mdgriffith$elm_ui$Element$Input$button,
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$Font$size(33),
 					$mdgriffith$elm_ui$Element$Background$color(
-					A4($mdgriffith$elm_ui$Element$rgba, 0, 1, 1, 0.2)),
-					$mdgriffith$elm_ui$Element$Border$rounded(100)
+					A4($mdgriffith$elm_ui$Element$rgba, 0, 1, 1, 0.1)),
+					$mdgriffith$elm_ui$Element$Border$rounded(100),
+					$mdgriffith$elm_ui$Element$padding(20)
 				]),
 			{
-				label: $mdgriffith$elm_ui$Element$text('Try again!'),
+				label: $mdgriffith$elm_ui$Element$text('New game'),
 				onPress: $elm$core$Maybe$Just($author$project$Main$NewGameClicked)
 			})
 		]));

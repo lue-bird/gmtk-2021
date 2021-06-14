@@ -4570,8 +4570,8 @@ var $author$project$Main$audio = F2(
 				return _Debug_todo(
 					'Main',
 					{
-						start: {line: 924, column: 13},
-						end: {line: 924, column: 23}
+						start: {line: 925, column: 13},
+						end: {line: 925, column: 23}
 					})(
 					$elm$core$Debug$toString(error));
 			}
@@ -9164,7 +9164,7 @@ var $author$project$Main$update = F2(
 										gameStage: (explosion.r < 120) ? $author$project$Main$FinalExplosion(
 											_Utils_update(
 												explosion,
-												{r: explosion.r + 4.4})) : $author$project$Main$GameOver
+												{r: explosion.r + 5})) : $author$project$Main$GameOver
 									}),
 								$elm$core$Platform$Cmd$none,
 								$MartinSStewart$elm_audio$Audio$cmdNone);
@@ -16284,7 +16284,7 @@ var $author$project$Main$viewDocument = F2(
 													$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
 													$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
 													$mdgriffith$elm_ui$Element$Background$color(
-													A4($mdgriffith$elm_ui$Element$rgba, 0, 0, 0, 0.7))
+													A4($mdgriffith$elm_ui$Element$rgba, 0, 0, 0, 0.9))
 												]),
 											$author$project$Main$viewGameOver(model)))
 									]),
@@ -16326,7 +16326,7 @@ var $author$project$Main$viewDocument = F2(
 														A2(
 															$timjs$elm_collage$Collage$filled,
 															$timjs$elm_collage$Collage$uniform(
-																A4($avh4$elm_color$Color$rgba, 0, 0, 0, 0.7)),
+																A4($avh4$elm_color$Color$rgba, 0, 0, 0, 0.9)),
 															$timjs$elm_collage$Collage$circle(r * 10))))))
 										]),
 									viewPlaying));

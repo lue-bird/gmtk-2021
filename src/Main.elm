@@ -529,7 +529,7 @@ update _ msg =
                             | gameStage =
                                 if explosion.r < 120 then
                                     FinalExplosion
-                                        { explosion | r = explosion.r + 4.4 }
+                                        { explosion | r = explosion.r + 5 }
 
                                 else
                                     GameOver
@@ -694,7 +694,7 @@ viewDocument _ model =
                                         |> Ui.el
                                             [ Ui.width Ui.fill
                                             , Ui.height Ui.fill
-                                            , Background.color (Ui.rgba 0 0 0 0.7)
+                                            , Background.color (Ui.rgba 0 0 0 0.9)
                                             ]
                                     )
                                 ]
@@ -704,7 +704,8 @@ viewDocument _ model =
                             |> Ui.el
                                 [ Ui.inFront
                                     (Collage.circle (r * 10)
-                                        |> Collage.filled (Color.rgba 0 0 0 0.7 |> Collage.uniform)
+                                        |> Collage.filled
+                                            (Color.rgba 0 0 0 0.9 |> Collage.uniform)
                                         |> Collage.Render.svgBox model.windowSize
                                         |> Ui.html
                                         |> Ui.el

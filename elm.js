@@ -4550,17 +4550,31 @@ var $MartinSStewart$elm_audio$Audio$group = function (audios) {
 	return $MartinSStewart$elm_audio$Audio$Group(audios);
 };
 var $MartinSStewart$elm_audio$Audio$silence = $MartinSStewart$elm_audio$Audio$group(_List_Nil);
+var $elm$core$Debug$toString = _Debug_toString;
+var $elm$core$Debug$todo = _Debug_todo;
 var $author$project$Main$audio = F2(
-	function (_v0, model) {
-		var _v1 = model.music;
-		if (_v1.$ === 'Just') {
-			var music = _v1.a;
-			return A2(
-				$MartinSStewart$elm_audio$Audio$audio,
-				music,
-				$elm$time$Time$millisToPosix(model.timePlaying));
-		} else {
+	function (_v0, _v1) {
+		var timePlayed = _v1.timePlayed;
+		var music = _v1.music;
+		if (music.$ === 'Nothing') {
 			return $MartinSStewart$elm_audio$Audio$silence;
+		} else {
+			if (music.a.$ === 'Ok') {
+				var source = music.a.a;
+				return A2(
+					$MartinSStewart$elm_audio$Audio$audio,
+					source,
+					$elm$time$Time$millisToPosix(timePlayed));
+			} else {
+				var error = music.a.a;
+				return _Debug_todo(
+					'Main',
+					{
+						start: {line: 880, column: 13},
+						end: {line: 880, column: 23}
+					})(
+					$elm$core$Debug$toString(error));
+			}
 		}
 	});
 var $elm$core$Result$Err = function (a) {
@@ -7562,7 +7576,7 @@ var $author$project$Main$init = _Utils_Tuple3(
 			}),
 		music: $elm$core$Maybe$Nothing,
 		pressedKeys: _List_Nil,
-		timePlaying: 0,
+		timePlayed: 0,
 		windowSize: $lue_bird$elm_xy$Xy$zero
 	},
 	$elm$core$Platform$Cmd$batch(
@@ -8127,6 +8141,7 @@ var $turboMaCk$non_empty_list_alias$List$NonEmpty$filter = function (f) {
 			$elm$core$List$filter(f)),
 		$turboMaCk$non_empty_list_alias$List$NonEmpty$toList);
 };
+var $turboMaCk$non_empty_list_alias$List$NonEmpty$fromCons = $elm$core$Tuple$pair;
 var $lue_bird$elm_xy$Xy$fromXY = function (record) {
 	return A2($lue_bird$elm_xy$Xy$xy, record.x, record.y);
 };
@@ -8234,20 +8249,16 @@ var $elm_community$list_extra$List$Extra$removeAt = F2(
 			}
 		}
 	});
+var $turboMaCk$non_empty_list_alias$List$NonEmpty$tail = function (_v0) {
+	var t = _v0.b;
+	return t;
+};
 var $elm$core$Basics$atan2 = _Basics_atan2;
 var $lue_bird$elm_xy$Xy$toAngle = function (direction_) {
 	return A2(
 		$elm$core$Basics$atan2,
 		$lue_bird$elm_xy$Xy$y(direction_),
 		$lue_bird$elm_xy$Xy$x(direction_));
-};
-var $elm$core$Result$toMaybe = function (result) {
-	if (result.$ === 'Ok') {
-		var v = result.a;
-		return $elm$core$Maybe$Just(v);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
 };
 var $avh4$elm_color$Color$toRgba = function (_v0) {
 	var r = _v0.a;
@@ -8814,25 +8825,19 @@ var $author$project$Main$update = F2(
 									overlap(planet),
 									others));
 						};
-						var arrows = A2(
-							$lue_bird$elm_xy$Xy$map,
-							$elm$core$Basics$toFloat,
-							$lue_bird$elm_xy$Xy$fromXY(
-								$ohanhi$keyboard$Keyboard$Arrows$arrows(model.pressedKeys)));
-						var _v6 = playing.planets;
-						var player_ = _v6.a;
-						var nonPlayerPlanets = _v6.b;
 						var collide = function (planets) {
 							var planet = $turboMaCk$non_empty_list_alias$List$NonEmpty$head(planets);
-							var overlapping = A2(
-								$elm$core$List$filter,
-								overlap(planet),
-								$turboMaCk$non_empty_list_alias$List$NonEmpty$toList(planets));
+							var nonEmptyOverlapping = A2(
+								$turboMaCk$non_empty_list_alias$List$NonEmpty$fromCons,
+								planet,
+								A2(
+									$elm$core$List$filter,
+									overlap(planet),
+									$turboMaCk$non_empty_list_alias$List$NonEmpty$tail(planets)));
+							var overlapping = $turboMaCk$non_empty_list_alias$List$NonEmpty$toList(nonEmptyOverlapping);
 							var newPlanets = function () {
 								if (overlapping.b && overlapping.b.b) {
-									var overlap0 = overlapping.a;
-									var _v8 = overlapping.b;
-									var overlap1 = _v8.a;
+									var _v7 = overlapping.b;
 									var splitters = A2(
 										$elm$core$List$filter,
 										A2(
@@ -8874,9 +8879,9 @@ var $author$project$Main$update = F2(
 										return $elm$core$List$sum(
 											A2(
 												$elm$core$List$map,
-												function (_v10) {
-													var r = _v10.r;
-													var color = _v10.color;
+												function (_v9) {
+													var r = _v9.r;
+													var color = _v9.color;
 													return r * component(
 														$avh4$elm_color$Color$toRgba(color));
 												},
@@ -8884,7 +8889,7 @@ var $author$project$Main$update = F2(
 									};
 									var biggestR = A2(
 										$elm$core$Maybe$withDefault,
-										0,
+										planet.r,
 										$elm$core$List$maximum(
 											A2(
 												$elm$core$List$map,
@@ -8905,9 +8910,9 @@ var $author$project$Main$update = F2(
 													},
 													$elm$core$Basics$eq(biggestR)),
 												overlapping)));
-									var newPlanet = function (_v9) {
-										var v = _v9.v;
-										var position = _v9.position;
+									var newPlanet = function (_v8) {
+										var v = _v8.v;
+										var position = _v8.position;
 										return {
 											color: A3(
 												$avh4$elm_color$Color$rgb,
@@ -8924,10 +8929,7 @@ var $author$project$Main$update = F2(
 														return $.blue;
 													})),
 											deadTails: biggest.deadTails,
-											isPlayer: A2(
-												$elm$core$Maybe$withDefault,
-												player_,
-												$elm$core$List$head(overlapping)).isPlayer,
+											isPlayer: planet.isPlayer,
 											position: position,
 											r: $author$project$Main$massToR(
 												$elm$core$List$sum(
@@ -9034,6 +9036,14 @@ var $author$project$Main$update = F2(
 											overlap(planet)),
 										planets)));
 						};
+						var arrows = A2(
+							$lue_bird$elm_xy$Xy$map,
+							$elm$core$Basics$toFloat,
+							$lue_bird$elm_xy$Xy$fromXY(
+								$ohanhi$keyboard$Keyboard$Arrows$arrows(model.pressedKeys)));
+						var _v10 = playing.planets;
+						var player_ = _v10.a;
+						var nonPlayerPlanets = _v10.b;
 						var planetsUpdatedPlayer = _Utils_Tuple2(
 							A2(
 								$author$project$Main$mapV,
@@ -9111,7 +9121,7 @@ var $author$project$Main$update = F2(
 											return $author$project$Main$GameOver;
 										}
 									}(),
-									timePlaying: model.timePlaying + 1
+									timePlayed: model.timePlayed + 1
 								}),
 							function () {
 								if (collidedPlanets.b) {
@@ -9134,12 +9144,7 @@ var $author$project$Main$update = F2(
 							}(),
 							$MartinSStewart$elm_audio$Audio$cmdNone);
 					} else {
-						return _Utils_Tuple3(
-							_Utils_update(
-								model,
-								{timePlaying: model.timePlaying + 1}),
-							$elm$core$Platform$Cmd$none,
-							$MartinSStewart$elm_audio$Audio$cmdNone);
+						return _Utils_Tuple3(model, $elm$core$Platform$Cmd$none, $MartinSStewart$elm_audio$Audio$cmdNone);
 					}
 				};
 			case 'KeyMsg':
@@ -9226,7 +9231,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							m,
 							{
-								music: $elm$core$Result$toMaybe(result)
+								music: $elm$core$Maybe$Just(result)
 							}),
 						$elm$core$Platform$Cmd$none,
 						$MartinSStewart$elm_audio$Audio$cmdNone);
@@ -15928,6 +15933,11 @@ var $author$project$Main$view = F2(
 				]));
 	});
 var $author$project$Main$NewGameClicked = {$: 'NewGameClicked'};
+var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
+	return {$: 'AlignY', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$Bottom = {$: 'Bottom'};
+var $mdgriffith$elm_ui$Element$alignBottom = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$Bottom);
 var $mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
 var $mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
 	return {$: 'Describe', a: a};
@@ -16077,9 +16087,6 @@ var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 };
 var $mdgriffith$elm_ui$Internal$Model$CenterX = {$: 'CenterX'};
 var $mdgriffith$elm_ui$Element$centerX = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$CenterX);
-var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
-	return {$: 'AlignY', a: a};
-};
 var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
 var $mdgriffith$elm_ui$Element$Font$color = function (fontColor) {
@@ -16190,40 +16197,50 @@ var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
-var $author$project$Main$viewGameOver = A2(
-	$mdgriffith$elm_ui$Element$column,
-	_List_fromArray(
-		[
-			$mdgriffith$elm_ui$Element$Font$color(
-			A3($mdgriffith$elm_ui$Element$rgb, 1, 1, 1)),
-			$mdgriffith$elm_ui$Element$centerX,
-			$mdgriffith$elm_ui$Element$centerY,
-			$mdgriffith$elm_ui$Element$spacing(10)
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$mdgriffith$elm_ui$Element$el,
+var $author$project$Main$viewGameOver = function (_v0) {
+	var timePlayed = _v0.timePlayed;
+	return A2(
+		$mdgriffith$elm_ui$Element$column,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$Font$color(
+				A3($mdgriffith$elm_ui$Element$rgb, 1, 1, 1)),
+				$mdgriffith$elm_ui$Element$centerX,
+				$mdgriffith$elm_ui$Element$centerY,
+				$mdgriffith$elm_ui$Element$spacing(10)
+			]),
+		A2(
+			$elm$core$List$map,
+			$mdgriffith$elm_ui$Element$el(
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$centerX])),
 			_List_fromArray(
 				[
-					$mdgriffith$elm_ui$Element$Font$size(50)
-				]),
-			$mdgriffith$elm_ui$Element$text('Game over')),
-			A2(
-			$mdgriffith$elm_ui$Element$Input$button,
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$Font$size(33),
-					$mdgriffith$elm_ui$Element$Background$color(
-					A4($mdgriffith$elm_ui$Element$rgba, 0, 1, 1, 0.1)),
-					$mdgriffith$elm_ui$Element$Border$rounded(100),
-					$mdgriffith$elm_ui$Element$padding(20)
-				]),
-			{
-				label: $mdgriffith$elm_ui$Element$text('New game'),
-				onPress: $elm$core$Maybe$Just($author$project$Main$NewGameClicked)
-			})
-		]));
+					A2(
+					$mdgriffith$elm_ui$Element$el,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$Font$size(30),
+							$mdgriffith$elm_ui$Element$alignBottom
+						]),
+					$mdgriffith$elm_ui$Element$text(
+						'☠ score ' + $elm$core$String$fromInt((timePlayed / 24) | 0))),
+					A2(
+					$mdgriffith$elm_ui$Element$Input$button,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$Font$size(33),
+							$mdgriffith$elm_ui$Element$Background$color(
+							A4($mdgriffith$elm_ui$Element$rgba, 0, 1, 1, 0.1)),
+							$mdgriffith$elm_ui$Element$Border$rounded(100),
+							$mdgriffith$elm_ui$Element$padding(20)
+						]),
+					{
+						label: $mdgriffith$elm_ui$Element$text('New game'),
+						onPress: $elm$core$Maybe$Just($author$project$Main$NewGameClicked)
+					})
+				])));
+};
 var $author$project$Main$viewDocument = F2(
 	function (_v0, model) {
 		return {
@@ -16238,7 +16255,7 @@ var $author$project$Main$viewDocument = F2(
 								model.windowSize,
 								A2($author$project$Main$view, model, playStage)));
 					} else {
-						return $author$project$Main$viewGameOver;
+						return $author$project$Main$viewGameOver(model);
 					}
 				}();
 				return $elm$core$List$singleton(

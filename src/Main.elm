@@ -49,8 +49,8 @@ type alias Model =
     { windowSize : Xy Float
     , pressedKeys : List Key
     , gameStage : GameStage
-    , timePlaying : Int -- millis
-    , music : Maybe Audio.Source
+    , timePlayed : Int -- frames
+    , music : Maybe (Result Audio.LoadError Audio.Source)
     }
 
 
@@ -156,7 +156,7 @@ init =
             , explosions = []
             }
                 |> Playing
-      , timePlaying = 0
+      , timePlayed = 0
       , music = Nothing
       }
     , List.repeat 9
@@ -291,14 +291,20 @@ update _ msg =
                                     planet =
                                         planets |> List.NonEmpty.head
 
+                                    nonEmptyOverlapping =
+                                        List.NonEmpty.fromCons planet
+                                            (planets
+                                                |> List.NonEmpty.tail
+                                                |> List.filter (overlap planet)
+                                            )
+
                                     overlapping =
-                                        planets
+                                        nonEmptyOverlapping
                                             |> List.NonEmpty.toList
-                                            |> List.filter (overlap planet)
 
                                     newPlanets =
                                         case overlapping of
-                                            overlap0 :: overlap1 :: _ ->
+                                            _ :: _ :: _ ->
                                                 let
                                                     avg aspect list =
                                                         (list |> List.map aspect |> List.sum)
@@ -324,7 +330,7 @@ update _ msg =
                                                             |> List.map .r
                                                             |> List.maximum
                                                             -- never
-                                                            |> Maybe.withDefault 0
+                                                            |> Maybe.withDefault planet.r
 
                                                     biggest =
                                                         overlapping
@@ -348,12 +354,7 @@ update _ msg =
                                                         (splitters |> List.length) + 1
 
                                                     newPlanet { v, position } =
-                                                        { isPlayer =
-                                                            overlapping
-                                                                |> List.head
-                                                                -- never
-                                                                |> Maybe.withDefault player_
-                                                                |> .isPlayer
+                                                        { isPlayer = planet.isPlayer
                                                         , position = position
                                                         , color =
                                                             rgb (componentAvg .red)
@@ -486,8 +487,8 @@ update _ msg =
 
                                     [] ->
                                         GameOver
-                            , timePlaying =
-                                model.timePlaying + 1
+                            , timePlayed =
+                                model.timePlayed + 1
                           }
                         , case collidedPlanets of
                             player__ :: _ ->
@@ -515,10 +516,7 @@ update _ msg =
                         )
 
                     GameOver ->
-                        ( { model
-                            | timePlaying =
-                                model.timePlaying + 1
-                          }
+                        ( model
                         , Cmd.none
                         , Audio.cmdNone
                         )
@@ -583,7 +581,7 @@ update _ msg =
 
         SoundLoadingResult result ->
             \m ->
-                ( { m | music = Result.toMaybe result }
+                ( { m | music = Just result }
                 , Cmd.none
                 , Audio.cmdNone
                 )
@@ -681,7 +679,7 @@ viewDocument _ model =
                             |> Ui.html
 
                     GameOver ->
-                        viewGameOver
+                        viewGameOver model
         in
         content
             |> Ui.layout
@@ -695,11 +693,13 @@ viewDocument _ model =
     }
 
 
-viewGameOver : Ui.Element Msg
-viewGameOver =
-    [ Ui.text "Game over"
+viewGameOver : { a | timePlayed : Int } -> Ui.Element Msg
+viewGameOver { timePlayed } =
+    [ Ui.text
+        ("score " ++ (timePlayed // 24 |> String.fromInt))
         |> Ui.el
-            [ Font.size 50
+            [ Font.size 30
+            , Ui.alignBottom
             ]
     , UiInput.button
         [ Font.size 33
@@ -711,6 +711,7 @@ viewGameOver =
         , onPress = Just NewGameClicked
         }
     ]
+        |> List.map (Ui.el [ Ui.centerX ])
         |> Ui.column
             [ Font.color (Ui.rgb 1 1 1)
             , Ui.centerX
@@ -866,14 +867,17 @@ view { windowSize } { stars, explosions, planets } =
 
 
 audio : AudioData -> Model -> Audio
-audio _ model =
-    case model.music of
-        Just music ->
-            Audio.audio music
-                (Time.millisToPosix model.timePlaying)
+audio _ { timePlayed, music } =
+    case music of
+        Just (Ok source) ->
+            Audio.audio source
+                (Time.millisToPosix timePlayed)
 
         Nothing ->
             Audio.silence
+
+        Just (Err error) ->
+            Debug.todo (Debug.toString error)
 
 
 
@@ -916,6 +920,8 @@ lengthAtMost maximumLength xy =
         xy
 
 
-xyRandom : Xy (Random.Generator coordinate) -> Random.Generator (Xy coordinate)
+xyRandom :
+    Xy (Random.Generator coordinate)
+    -> Random.Generator (Xy coordinate)
 xyRandom =
     \( x, y ) -> Random.map2 xy x y

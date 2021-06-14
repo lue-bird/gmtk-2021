@@ -138,6 +138,14 @@ massToR m =
 
 init : ( Model, Cmd Msg, AudioCmd Msg )
 init =
+    newGame
+        (Audio.loadAudio SoundLoadingResult
+            "https://lue-bird.github.io/time-to-face-gravity/"
+        )
+
+
+newGame : AudioCmd Msg -> ( Model, Cmd Msg, AudioCmd Msg )
+newGame audioCmd =
     ( { windowSize = Xy.zero
       , pressedKeys = []
       , planets =
@@ -169,8 +177,7 @@ init =
                     (.viewport >> Xy.fromSize >> Resized)
            ]
         |> Cmd.batch
-    , Audio.loadAudio SoundLoadingResult
-        "https://github.com/lue-bird/time-to-face-gravity/blob/master/music/space%202.wav"
+    , audioCmd
     )
 
 
@@ -188,7 +195,7 @@ update : AudioData -> Msg -> Model -> ( Model, Cmd Msg, AudioCmd Msg )
 update _ msg =
     case msg of
         NewGameClicked ->
-            \_ -> init
+            \_ -> newGame Audio.cmdNone
 
         Resized windowSize ->
             \m ->

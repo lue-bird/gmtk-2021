@@ -4570,8 +4570,8 @@ var $author$project$Main$audio = F2(
 				return _Debug_todo(
 					'Main',
 					{
-						start: {line: 917, column: 13},
-						end: {line: 917, column: 23}
+						start: {line: 924, column: 13},
+						end: {line: 924, column: 23}
 					})(
 					$elm$core$Debug$toString(error));
 			}
@@ -7003,6 +7003,48 @@ var $MartinSStewart$elm_audio$Audio$documentWithAudio = A2(
 				}
 			});
 	});
+var $author$project$Main$SoundLoadingResult = function (a) {
+	return {$: 'SoundLoadingResult', a: a};
+};
+var $MartinSStewart$elm_audio$Audio$AudioLoadRequest = function (a) {
+	return {$: 'AudioLoadRequest', a: a};
+};
+var $MartinSStewart$elm_audio$Audio$ErrorThatHappensWhenYouLoadMoreThan1000SoundsDueToHackyWorkAroundToMakeThisPackageBehaveMoreLikeAnEffectPackage = {$: 'ErrorThatHappensWhenYouLoadMoreThan1000SoundsDueToHackyWorkAroundToMakeThisPackageBehaveMoreLikeAnEffectPackage'};
+var $MartinSStewart$elm_audio$Audio$enumeratedResults = A2(
+	$mgold$elm_nonempty_list$List$Nonempty$Nonempty,
+	$elm$core$Result$Err($MartinSStewart$elm_audio$Audio$ErrorThatHappensWhenYouLoadMoreThan1000SoundsDueToHackyWorkAroundToMakeThisPackageBehaveMoreLikeAnEffectPackage),
+	_Utils_ap(
+		_List_fromArray(
+			[
+				$elm$core$Result$Err($MartinSStewart$elm_audio$Audio$FailedToDecode),
+				$elm$core$Result$Err($MartinSStewart$elm_audio$Audio$NetworkError),
+				$elm$core$Result$Err($MartinSStewart$elm_audio$Audio$UnknownError)
+			]),
+		A2(
+			$elm$core$List$map,
+			function (bufferId) {
+				return $elm$core$Result$Ok(
+					$MartinSStewart$elm_audio$Audio$File(
+						{
+							bufferId: $MartinSStewart$elm_audio$Audio$BufferId(bufferId)
+						}));
+			},
+			A2($elm$core$List$range, 0, 1000))));
+var $MartinSStewart$elm_audio$Audio$loadAudio = F2(
+	function (userMsg, url) {
+		return $MartinSStewart$elm_audio$Audio$AudioLoadRequest(
+			{
+				audioUrl: url,
+				userMsg: A2(
+					$mgold$elm_nonempty_list$List$Nonempty$map,
+					function (results) {
+						return _Utils_Tuple2(
+							results,
+							userMsg(results));
+					},
+					$MartinSStewart$elm_audio$Audio$enumeratedResults)
+			});
+	});
 var $author$project$Main$Join = {$: 'Join'};
 var $author$project$Main$PlanetGenerated = function (a) {
 	return {$: 'PlanetGenerated', a: a};
@@ -7011,9 +7053,6 @@ var $author$project$Main$Player = {$: 'Player'};
 var $author$project$Main$Playing = {$: 'Playing'};
 var $author$project$Main$Resized = function (a) {
 	return {$: 'Resized', a: a};
-};
-var $author$project$Main$SoundLoadingResult = function (a) {
-	return {$: 'SoundLoadingResult', a: a};
 };
 var $author$project$Main$StarsGenerated = function (a) {
 	return {$: 'StarsGenerated', a: a};
@@ -7150,45 +7189,6 @@ var $elm$random$Random$list = F2(
 		return $elm$random$Random$Generator(
 			function (seed) {
 				return A4($elm$random$Random$listHelp, _List_Nil, n, gen, seed);
-			});
-	});
-var $MartinSStewart$elm_audio$Audio$AudioLoadRequest = function (a) {
-	return {$: 'AudioLoadRequest', a: a};
-};
-var $MartinSStewart$elm_audio$Audio$ErrorThatHappensWhenYouLoadMoreThan1000SoundsDueToHackyWorkAroundToMakeThisPackageBehaveMoreLikeAnEffectPackage = {$: 'ErrorThatHappensWhenYouLoadMoreThan1000SoundsDueToHackyWorkAroundToMakeThisPackageBehaveMoreLikeAnEffectPackage'};
-var $MartinSStewart$elm_audio$Audio$enumeratedResults = A2(
-	$mgold$elm_nonempty_list$List$Nonempty$Nonempty,
-	$elm$core$Result$Err($MartinSStewart$elm_audio$Audio$ErrorThatHappensWhenYouLoadMoreThan1000SoundsDueToHackyWorkAroundToMakeThisPackageBehaveMoreLikeAnEffectPackage),
-	_Utils_ap(
-		_List_fromArray(
-			[
-				$elm$core$Result$Err($MartinSStewart$elm_audio$Audio$FailedToDecode),
-				$elm$core$Result$Err($MartinSStewart$elm_audio$Audio$NetworkError),
-				$elm$core$Result$Err($MartinSStewart$elm_audio$Audio$UnknownError)
-			]),
-		A2(
-			$elm$core$List$map,
-			function (bufferId) {
-				return $elm$core$Result$Ok(
-					$MartinSStewart$elm_audio$Audio$File(
-						{
-							bufferId: $MartinSStewart$elm_audio$Audio$BufferId(bufferId)
-						}));
-			},
-			A2($elm$core$List$range, 0, 1000))));
-var $MartinSStewart$elm_audio$Audio$loadAudio = F2(
-	function (userMsg, url) {
-		return $MartinSStewart$elm_audio$Audio$AudioLoadRequest(
-			{
-				audioUrl: url,
-				userMsg: A2(
-					$mgold$elm_nonempty_list$List$Nonempty$map,
-					function (results) {
-						return _Utils_Tuple2(
-							results,
-							userMsg(results));
-					},
-					$MartinSStewart$elm_audio$Audio$enumeratedResults)
 			});
 	});
 var $author$project$Main$Kill = {$: 'Kill'};
@@ -7554,58 +7554,62 @@ var $turboMaCk$non_empty_list_alias$List$NonEmpty$singleton = function (h) {
 	return _Utils_Tuple2(h, _List_Nil);
 };
 var $lue_bird$elm_xy$Xy$zero = $lue_bird$elm_xy$Xy$both(0);
-var $author$project$Main$init = _Utils_Tuple3(
-	{
-		explosions: _List_Nil,
-		gameStage: $author$project$Main$Playing,
-		music: $elm$core$Maybe$Nothing,
-		planets: $turboMaCk$non_empty_list_alias$List$NonEmpty$singleton(
-			{
-				color: A3($avh4$elm_color$Color$rgb, 1, 1, 0),
-				deadTails: _List_Nil,
-				isPlayer: $author$project$Main$Player,
-				position: $lue_bird$elm_xy$Xy$zero,
-				r: 2.2,
-				tail: _List_Nil,
-				v: $lue_bird$elm_xy$Xy$zero,
-				whenHit: $author$project$Main$Join
-			}),
-		pressedKeys: _List_Nil,
-		stars: _List_Nil,
-		timePlayed: 0,
-		windowSize: $lue_bird$elm_xy$Xy$zero
-	},
-	$elm$core$Platform$Cmd$batch(
-		_Utils_ap(
-			A2(
-				$elm$core$List$repeat,
-				9,
+var $author$project$Main$newGame = function (audioCmd) {
+	return _Utils_Tuple3(
+		{
+			explosions: _List_Nil,
+			gameStage: $author$project$Main$Playing,
+			music: $elm$core$Maybe$Nothing,
+			planets: $turboMaCk$non_empty_list_alias$List$NonEmpty$singleton(
+				{
+					color: A3($avh4$elm_color$Color$rgb, 1, 1, 0),
+					deadTails: _List_Nil,
+					isPlayer: $author$project$Main$Player,
+					position: $lue_bird$elm_xy$Xy$zero,
+					r: 2.2,
+					tail: _List_Nil,
+					v: $lue_bird$elm_xy$Xy$zero,
+					whenHit: $author$project$Main$Join
+				}),
+			pressedKeys: _List_Nil,
+			stars: _List_Nil,
+			timePlayed: 0,
+			windowSize: $lue_bird$elm_xy$Xy$zero
+		},
+		$elm$core$Platform$Cmd$batch(
+			_Utils_ap(
 				A2(
-					$elm$random$Random$generate,
-					$author$project$Main$PlanetGenerated,
-					$author$project$Main$randomPlanet(
-						{atLeast: 70, awayFrom: $lue_bird$elm_xy$Xy$zero}))),
-			_List_fromArray(
-				[
+					$elm$core$List$repeat,
+					9,
 					A2(
-					$elm$random$Random$generate,
-					$author$project$Main$StarsGenerated,
-					A2(
-						$elm$random$Random$list,
-						800,
-						$author$project$Main$randomStar(
-							{atLeast: 0, awayFrom: $lue_bird$elm_xy$Xy$zero}))),
-					A2(
-					$elm$core$Task$perform,
-					A2(
-						$elm$core$Basics$composeR,
-						function ($) {
-							return $.viewport;
-						},
-						A2($elm$core$Basics$composeR, $lue_bird$elm_xy$Xy$fromSize, $author$project$Main$Resized)),
-					$elm$browser$Browser$Dom$getViewport)
-				]))),
-	A2($MartinSStewart$elm_audio$Audio$loadAudio, $author$project$Main$SoundLoadingResult, 'https://github.com/lue-bird/time-to-face-gravity/blob/master/music/space%202.wav'));
+						$elm$random$Random$generate,
+						$author$project$Main$PlanetGenerated,
+						$author$project$Main$randomPlanet(
+							{atLeast: 70, awayFrom: $lue_bird$elm_xy$Xy$zero}))),
+				_List_fromArray(
+					[
+						A2(
+						$elm$random$Random$generate,
+						$author$project$Main$StarsGenerated,
+						A2(
+							$elm$random$Random$list,
+							800,
+							$author$project$Main$randomStar(
+								{atLeast: 0, awayFrom: $lue_bird$elm_xy$Xy$zero}))),
+						A2(
+						$elm$core$Task$perform,
+						A2(
+							$elm$core$Basics$composeR,
+							function ($) {
+								return $.viewport;
+							},
+							A2($elm$core$Basics$composeR, $lue_bird$elm_xy$Xy$fromSize, $author$project$Main$Resized)),
+						$elm$browser$Browser$Dom$getViewport)
+					]))),
+		audioCmd);
+};
+var $author$project$Main$init = $author$project$Main$newGame(
+	A2($MartinSStewart$elm_audio$Audio$loadAudio, $author$project$Main$SoundLoadingResult, 'https://lue-bird.github.io/time-to-face-gravity/'));
 var $author$project$Main$Frame = function (a) {
 	return {$: 'Frame', a: a};
 };
@@ -8713,7 +8717,7 @@ var $author$project$Main$update = F2(
 		switch (msg.$) {
 			case 'NewGameClicked':
 				return function (_v2) {
-					return $author$project$Main$init;
+					return $author$project$Main$newGame($MartinSStewart$elm_audio$Audio$cmdNone);
 				};
 			case 'Resized':
 				var windowSize = msg.a;

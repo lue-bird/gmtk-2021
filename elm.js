@@ -4570,8 +4570,8 @@ var $author$project$Main$audio = F2(
 				return _Debug_todo(
 					'Main',
 					{
-						start: {line: 880, column: 13},
-						end: {line: 880, column: 23}
+						start: {line: 917, column: 13},
+						end: {line: 917, column: 23}
 					})(
 					$elm$core$Debug$toString(error));
 			}
@@ -7008,9 +7008,7 @@ var $author$project$Main$PlanetGenerated = function (a) {
 	return {$: 'PlanetGenerated', a: a};
 };
 var $author$project$Main$Player = {$: 'Player'};
-var $author$project$Main$Playing = function (a) {
-	return {$: 'Playing', a: a};
-};
+var $author$project$Main$Playing = {$: 'Playing'};
 var $author$project$Main$Resized = function (a) {
 	return {$: 'Resized', a: a};
 };
@@ -7558,24 +7556,22 @@ var $turboMaCk$non_empty_list_alias$List$NonEmpty$singleton = function (h) {
 var $lue_bird$elm_xy$Xy$zero = $lue_bird$elm_xy$Xy$both(0);
 var $author$project$Main$init = _Utils_Tuple3(
 	{
-		gameStage: $author$project$Main$Playing(
-			{
-				explosions: _List_Nil,
-				planets: $turboMaCk$non_empty_list_alias$List$NonEmpty$singleton(
-					{
-						color: A3($avh4$elm_color$Color$rgb, 1, 1, 0),
-						deadTails: _List_Nil,
-						isPlayer: $author$project$Main$Player,
-						position: $lue_bird$elm_xy$Xy$zero,
-						r: 2.2,
-						tail: _List_Nil,
-						v: $lue_bird$elm_xy$Xy$zero,
-						whenHit: $author$project$Main$Join
-					}),
-				stars: _List_Nil
-			}),
+		explosions: _List_Nil,
+		gameStage: $author$project$Main$Playing,
 		music: $elm$core$Maybe$Nothing,
+		planets: $turboMaCk$non_empty_list_alias$List$NonEmpty$singleton(
+			{
+				color: A3($avh4$elm_color$Color$rgb, 1, 1, 0),
+				deadTails: _List_Nil,
+				isPlayer: $author$project$Main$Player,
+				position: $lue_bird$elm_xy$Xy$zero,
+				r: 2.2,
+				tail: _List_Nil,
+				v: $lue_bird$elm_xy$Xy$zero,
+				whenHit: $author$project$Main$Join
+			}),
 		pressedKeys: _List_Nil,
+		stars: _List_Nil,
 		timePlayed: 0,
 		windowSize: $lue_bird$elm_xy$Xy$zero
 	},
@@ -8040,6 +8036,9 @@ var $author$project$Main$subscriptions = F2(
 					A2($elm$core$Platform$Sub$map, $author$project$Main$KeyMsg, $ohanhi$keyboard$Keyboard$subscriptions)
 				]));
 	});
+var $author$project$Main$FinalExplosion = function (a) {
+	return {$: 'FinalExplosion', a: a};
+};
 var $author$project$Main$GameOver = {$: 'GameOver'};
 var $ohanhi$keyboard$Keyboard$ArrowDown = {$: 'ArrowDown'};
 var $ohanhi$keyboard$Keyboard$ArrowLeft = {$: 'ArrowLeft'};
@@ -8737,414 +8736,436 @@ var $author$project$Main$update = F2(
 				var millis = msg.a;
 				return function (model) {
 					var _v3 = model.gameStage;
-					if (_v3.$ === 'Playing') {
-						var playing = _v3.a;
-						var updateTail = $turboMaCk$non_empty_list_alias$List$NonEmpty$map(
-							function (planet) {
-								return _Utils_update(
-									planet,
-									{
-										tail: A2(
-											$elm$core$List$take,
-											172,
-											A2($elm$core$List$cons, planet.position, planet.tail))
-									});
-							});
-						var updatePlanet = function (planet) {
-							var cappedV = A2($author$project$Main$lengthAtMost, 2, planet.v);
-							return A2(
-								$author$project$Main$mapPosition,
-								A2($lue_bird$elm_xy$Xy$map2, $elm$core$Basics$add, cappedV),
-								_Utils_update(
-									planet,
-									{v: cappedV}));
-						};
-						var planetsWithGravity = function (planets) {
-							return A2(
-								$turboMaCk$non_empty_list_alias$List$NonEmpty$indexedMap,
-								F2(
-									function (i, planet) {
-										return A3(
-											$elm$core$List$foldl,
-											function (other) {
-												return $author$project$Main$mapV(
-													A2(
-														$lue_bird$elm_xy$Xy$map2,
-														$elm$core$Basics$add,
+					switch (_v3.$) {
+						case 'Playing':
+							var updateTail = $turboMaCk$non_empty_list_alias$List$NonEmpty$map(
+								function (planet) {
+									return _Utils_update(
+										planet,
+										{
+											tail: A2(
+												$elm$core$List$take,
+												172,
+												A2($elm$core$List$cons, planet.position, planet.tail))
+										});
+								});
+							var updatePlanet = function (planet) {
+								var cappedV = A2($author$project$Main$lengthAtMost, 2, planet.v);
+								return A2(
+									$author$project$Main$mapPosition,
+									A2($lue_bird$elm_xy$Xy$map2, $elm$core$Basics$add, cappedV),
+									_Utils_update(
+										planet,
+										{v: cappedV}));
+							};
+							var planetsWithGravity = function (planets) {
+								return A2(
+									$turboMaCk$non_empty_list_alias$List$NonEmpty$indexedMap,
+									F2(
+										function (i, planet) {
+											return A3(
+												$elm$core$List$foldl,
+												function (other) {
+													return $author$project$Main$mapV(
 														A2(
-															$author$project$Main$lengthAtMost,
-															0.2,
+															$lue_bird$elm_xy$Xy$map2,
+															$elm$core$Basics$add,
 															A2(
-																$lue_bird$elm_xy$Xy$map,
-																$elm$core$Basics$mul(
-																	($author$project$Main$mass(other) * 0.4) / A2(
-																		$elm$core$Basics$pow,
-																		A2($author$project$Main$distance, planet, other),
-																		1)),
-																$lue_bird$elm_xy$Xy$direction(
-																	$lue_bird$elm_xy$Xy$toAngle(
-																		A2($author$project$Main$difference, planet.position, other.position)))))));
-											},
-											planet,
+																$author$project$Main$lengthAtMost,
+																0.2,
+																A2(
+																	$lue_bird$elm_xy$Xy$map,
+																	$elm$core$Basics$mul(
+																		($author$project$Main$mass(other) * 0.4) / A2(
+																			$elm$core$Basics$pow,
+																			A2($author$project$Main$distance, planet, other),
+																			1)),
+																	$lue_bird$elm_xy$Xy$direction(
+																		$lue_bird$elm_xy$Xy$toAngle(
+																			A2($author$project$Main$difference, planet.position, other.position)))))));
+												},
+												planet,
+												A2(
+													$elm_community$list_extra$List$Extra$removeAt,
+													i,
+													$turboMaCk$non_empty_list_alias$List$NonEmpty$toList(planets)));
+										}),
+									planets);
+							};
+							var overlap = F2(
+								function (planet, other) {
+									return _Utils_cmp(
+										A2($author$project$Main$distance, planet, other),
+										A2($elm$core$Basics$max, planet.r, other.r)) < 0;
+								});
+							var overlaps = function (_v4) {
+								var planet = _v4.a;
+								var others = _v4.b;
+								return _Utils_ap(
+									function () {
+										var _v5 = A2(
+											$elm$core$List$filter,
 											A2(
-												$elm_community$list_extra$List$Extra$removeAt,
-												i,
-												$turboMaCk$non_empty_list_alias$List$NonEmpty$toList(planets)));
-									}),
-								planets);
-						};
-						var overlap = F2(
-							function (planet, other) {
-								return _Utils_cmp(
-									A2($author$project$Main$distance, planet, other),
-									A2($elm$core$Basics$max, planet.r, other.r)) < 0;
-							});
-						var overlaps = function (_v4) {
-							var planet = _v4.a;
-							var others = _v4.b;
-							return _Utils_ap(
-								function () {
-									var _v5 = A2(
+												$elm$core$Basics$composeL,
+												$elm$core$Basics$not,
+												overlap(planet)),
+											others);
+										if (_v5.b) {
+											var head = _v5.a;
+											var tail = _v5.b;
+											return overlaps(
+												_Utils_Tuple2(head, tail));
+										} else {
+											return _List_Nil;
+										}
+									}(),
+									A2(
 										$elm$core$List$filter,
-										A2(
-											$elm$core$Basics$composeL,
-											$elm$core$Basics$not,
-											overlap(planet)),
-										others);
-									if (_v5.b) {
-										var head = _v5.a;
-										var tail = _v5.b;
-										return overlaps(
-											_Utils_Tuple2(head, tail));
-									} else {
-										return _List_Nil;
-									}
-								}(),
-								A2(
-									$elm$core$List$filter,
-									overlap(planet),
-									others));
-						};
-						var collide = function (planets) {
-							var planet = $turboMaCk$non_empty_list_alias$List$NonEmpty$head(planets);
-							var nonEmptyOverlapping = A2(
-								$turboMaCk$non_empty_list_alias$List$NonEmpty$fromCons,
-								planet,
-								A2(
-									$elm$core$List$filter,
-									overlap(planet),
-									$turboMaCk$non_empty_list_alias$List$NonEmpty$tail(planets)));
-							var overlapping = $turboMaCk$non_empty_list_alias$List$NonEmpty$toList(nonEmptyOverlapping);
-							var newPlanets = function () {
-								if (overlapping.b && overlapping.b.b) {
-									var _v7 = overlapping.b;
-									var splitters = A2(
+										overlap(planet),
+										others));
+							};
+							var collide = function (planets) {
+								var planet = $turboMaCk$non_empty_list_alias$List$NonEmpty$head(planets);
+								var nonEmptyOverlapping = A2(
+									$turboMaCk$non_empty_list_alias$List$NonEmpty$fromCons,
+									planet,
+									A2(
 										$elm$core$List$filter,
-										A2(
-											$elm$core$Basics$composeR,
-											function ($) {
-												return $.whenHit;
-											},
-											$elm$core$Basics$eq($author$project$Main$Split)),
-										overlapping);
-									var splitCount = $elm$core$List$length(splitters) + 1;
-									var killerCount = $elm$core$List$length(
-										A2(
+										overlap(planet),
+										$turboMaCk$non_empty_list_alias$List$NonEmpty$tail(planets)));
+								var overlapping = $turboMaCk$non_empty_list_alias$List$NonEmpty$toList(nonEmptyOverlapping);
+								var newPlanets = function () {
+									if (overlapping.b && overlapping.b.b) {
+										var _v7 = overlapping.b;
+										var splitters = A2(
 											$elm$core$List$filter,
 											A2(
 												$elm$core$Basics$composeR,
 												function ($) {
 													return $.whenHit;
 												},
-												$elm$core$Basics$eq($author$project$Main$Kill)),
-											overlapping));
-									var joiners = A2(
-										$elm$core$List$filter,
-										A2(
-											$elm$core$Basics$composeR,
-											function ($) {
-												return $.whenHit;
-											},
-											$elm$core$Basics$eq($author$project$Main$Join)),
-										overlapping);
-									var rSum = $elm$core$List$sum(
-										A2(
-											$elm$core$List$map,
-											function ($) {
-												return $.r;
-											},
-											joiners));
-									var joinerCount = $elm$core$List$length(joiners);
-									var componentAvg = function (component) {
-										return $elm$core$List$sum(
-											A2(
-												$elm$core$List$map,
-												function (_v9) {
-													var r = _v9.r;
-													var color = _v9.color;
-													return r * component(
-														$avh4$elm_color$Color$toRgba(color));
-												},
-												joiners)) / rSum;
-									};
-									var biggestR = A2(
-										$elm$core$Maybe$withDefault,
-										planet.r,
-										$elm$core$List$maximum(
-											A2(
-												$elm$core$List$map,
-												function ($) {
-													return $.r;
-												},
-												joiners)));
-									var biggest = A2(
-										$elm$core$Maybe$withDefault,
-										planet,
-										$elm$core$List$head(
+												$elm$core$Basics$eq($author$project$Main$Split)),
+											overlapping);
+										var splitCount = $elm$core$List$length(splitters) + 1;
+										var killerCount = $elm$core$List$length(
 											A2(
 												$elm$core$List$filter,
 												A2(
 													$elm$core$Basics$composeR,
 													function ($) {
+														return $.whenHit;
+													},
+													$elm$core$Basics$eq($author$project$Main$Kill)),
+												overlapping));
+										var joiners = A2(
+											$elm$core$List$filter,
+											A2(
+												$elm$core$Basics$composeR,
+												function ($) {
+													return $.whenHit;
+												},
+												$elm$core$Basics$eq($author$project$Main$Join)),
+											overlapping);
+										var rSum = $elm$core$List$sum(
+											A2(
+												$elm$core$List$map,
+												function ($) {
+													return $.r;
+												},
+												joiners));
+										var joinerCount = $elm$core$List$length(joiners);
+										var componentAvg = function (component) {
+											return $elm$core$List$sum(
+												A2(
+													$elm$core$List$map,
+													function (_v9) {
+														var r = _v9.r;
+														var color = _v9.color;
+														return r * component(
+															$avh4$elm_color$Color$toRgba(color));
+													},
+													joiners)) / rSum;
+										};
+										var biggestR = A2(
+											$elm$core$Maybe$withDefault,
+											planet.r,
+											$elm$core$List$maximum(
+												A2(
+													$elm$core$List$map,
+													function ($) {
 														return $.r;
 													},
-													$elm$core$Basics$eq(biggestR)),
-												overlapping)));
-									var newPlanet = function (_v8) {
-										var v = _v8.v;
-										var position = _v8.position;
-										return {
-											color: A3(
-												$avh4$elm_color$Color$rgb,
-												componentAvg(
-													function ($) {
-														return $.red;
-													}),
-												componentAvg(
-													function ($) {
-														return $.green;
-													}),
-												componentAvg(
-													function ($) {
-														return $.blue;
-													})),
-											deadTails: biggest.deadTails,
-											isPlayer: planet.isPlayer,
-											position: position,
-											r: $author$project$Main$massToR(
-												$elm$core$List$sum(
-													A2($elm$core$List$map, $author$project$Main$mass, joiners)) / splitCount),
-											tail: biggest.tail,
-											v: v,
-											whenHit: $author$project$Main$Join
+													joiners)));
+										var biggest = A2(
+											$elm$core$Maybe$withDefault,
+											planet,
+											$elm$core$List$head(
+												A2(
+													$elm$core$List$filter,
+													A2(
+														$elm$core$Basics$composeR,
+														function ($) {
+															return $.r;
+														},
+														$elm$core$Basics$eq(biggestR)),
+													overlapping)));
+										var newPlanet = function (_v8) {
+											var v = _v8.v;
+											var position = _v8.position;
+											return {
+												color: A3(
+													$avh4$elm_color$Color$rgb,
+													componentAvg(
+														function ($) {
+															return $.red;
+														}),
+													componentAvg(
+														function ($) {
+															return $.green;
+														}),
+													componentAvg(
+														function ($) {
+															return $.blue;
+														})),
+												deadTails: biggest.deadTails,
+												isPlayer: planet.isPlayer,
+												position: position,
+												r: $author$project$Main$massToR(
+													$elm$core$List$sum(
+														A2($elm$core$List$map, $author$project$Main$mass, joiners)) / splitCount),
+												tail: biggest.tail,
+												v: v,
+												whenHit: $author$project$Main$Join
+											};
 										};
-									};
-									var avg = F2(
-										function (aspect, list) {
-											return $elm$core$List$sum(
-												A2($elm$core$List$map, aspect, list)) / $elm$core$List$length(list);
-										});
-									return (killerCount > 0) ? _List_Nil : ((splitCount === 1) ? A2(
-										$elm$core$List$cons,
-										newPlanet(
-											{
-												position: biggest.position,
-												v: A2(
-													$lue_bird$elm_xy$Xy$map,
-													function (aspect) {
-														return $elm$core$List$sum(
-															A2($elm$core$List$map, aspect, joiners));
-													},
-													_Utils_Tuple2(
-														A2(
-															$elm$core$Basics$composeR,
-															function ($) {
-																return $.v;
-															},
-															$lue_bird$elm_xy$Xy$x),
-														A2(
-															$elm$core$Basics$composeR,
-															function ($) {
-																return $.v;
-															},
-															$lue_bird$elm_xy$Xy$y)))
-											}),
-										_List_Nil) : A2(
-										$elm$core$List$map,
-										function (i) {
-											return newPlanet(
+										var avg = F2(
+											function (aspect, list) {
+												return $elm$core$List$sum(
+													A2($elm$core$List$map, aspect, list)) / $elm$core$List$length(list);
+											});
+										return (killerCount > 0) ? _List_Nil : ((splitCount === 1) ? A2(
+											$elm$core$List$cons,
+											newPlanet(
 												{
-													position: A3(
-														$lue_bird$elm_xy$Xy$map2,
-														$elm$core$Basics$add,
-														A2(
-															$lue_bird$elm_xy$Xy$map,
-															$elm$core$Basics$mul(rSum),
-															$lue_bird$elm_xy$Xy$direction(
-																$elm$core$Basics$turns((i + 1) / splitCount))),
-														biggest.position),
-													v: function () {
-														var splitAngle = $lue_bird$elm_xy$Xy$toAngle(
+													position: biggest.position,
+													v: A2(
+														$lue_bird$elm_xy$Xy$map,
+														function (aspect) {
+															return $elm$core$List$sum(
+																A2($elm$core$List$map, aspect, joiners));
+														},
+														_Utils_Tuple2(
+															A2(
+																$elm$core$Basics$composeR,
+																function ($) {
+																	return $.v;
+																},
+																$lue_bird$elm_xy$Xy$x),
+															A2(
+																$elm$core$Basics$composeR,
+																function ($) {
+																	return $.v;
+																},
+																$lue_bird$elm_xy$Xy$y)))
+												}),
+											_List_Nil) : A2(
+											$elm$core$List$map,
+											function (i) {
+												return newPlanet(
+													{
+														position: A3(
+															$lue_bird$elm_xy$Xy$map2,
+															$elm$core$Basics$add,
 															A2(
 																$lue_bird$elm_xy$Xy$map,
-																function (aspect) {
-																	return A2(avg, aspect, splitters);
-																},
-																_Utils_Tuple2(
-																	A2(
-																		$elm$core$Basics$composeR,
-																		function ($) {
-																			return $.v;
-																		},
-																		$lue_bird$elm_xy$Xy$x),
-																	A2(
-																		$elm$core$Basics$composeR,
-																		function ($) {
-																			return $.v;
-																		},
-																		$lue_bird$elm_xy$Xy$y))));
-														return A2(
-															$lue_bird$elm_xy$Xy$map,
-															$elm$core$Basics$mul(5.3),
-															$lue_bird$elm_xy$Xy$direction(
-																(splitAngle + $elm$core$Basics$turns(1 / 4)) + $elm$core$Basics$turns((i + 1) / splitCount)));
-													}()
-												});
-										},
-										A2($elm$core$List$range, 0, splitCount - 1)));
-								} else {
-									return _List_fromArray(
-										[planet]);
-								}
-							}();
-							return A2(
-								$elm$core$Maybe$withDefault,
-								newPlanets,
-								A2(
-									$elm$core$Maybe$map,
-									A2(
-										$elm$core$Basics$composeR,
-										collide,
-										function (planets_) {
-											return _Utils_ap(newPlanets, planets_);
-										}),
-									A2(
-										$turboMaCk$non_empty_list_alias$List$NonEmpty$filter,
-										A2(
-											$elm$core$Basics$composeL,
-											$elm$core$Basics$not,
-											overlap(planet)),
-										planets)));
-						};
-						var arrows = A2(
-							$lue_bird$elm_xy$Xy$map,
-							$elm$core$Basics$toFloat,
-							$lue_bird$elm_xy$Xy$fromXY(
-								$ohanhi$keyboard$Keyboard$Arrows$arrows(model.pressedKeys)));
-						var _v10 = playing.planets;
-						var player_ = _v10.a;
-						var nonPlayerPlanets = _v10.b;
-						var planetsUpdatedPlayer = _Utils_Tuple2(
-							A2(
-								$author$project$Main$mapV,
-								A2(
-									$lue_bird$elm_xy$Xy$map2,
-									$elm$core$Basics$add,
-									A2(
-										$lue_bird$elm_xy$Xy$map,
-										$elm$core$Basics$mul(0.84),
-										arrows)),
-								player_),
-							nonPlayerPlanets);
-						var planetsMoved = A2(
-							$turboMaCk$non_empty_list_alias$List$NonEmpty$map,
-							updatePlanet,
-							planetsWithGravity(planetsUpdatedPlayer));
-						var newExplosions = A2(
-							$elm$core$List$map,
-							function (_v16) {
-								var r = _v16.r;
-								var position = _v16.position;
-								var color = _v16.color;
-								return {color: color, position: position, r: r};
-							},
-							overlaps(planetsMoved));
-						var _v11 = planetsMoved;
-						var movedPlayer = _v11.a;
-						var movedPlanets = _v11.b;
-						var collidedPlanets = collide(
-							updateTail(
-								_Utils_Tuple2(
-									movedPlayer,
-									A2(
-										$elm$core$List$filter,
-										function (planet) {
-											return A2($author$project$Main$distance, planet, movedPlayer) < 400;
-										},
-										movedPlanets))));
-						return _Utils_Tuple3(
-							_Utils_update(
-								model,
-								{
-									gameStage: function () {
-										if (collidedPlanets.b) {
-											var head = collidedPlanets.a;
-											var tail = collidedPlanets.b;
-											var _v13 = head.isPlayer;
-											if (_v13.$ === 'Player') {
-												return $author$project$Main$Playing(
-													_Utils_update(
-														playing,
-														{
-															explosions: _Utils_ap(
-																newExplosions,
+																$elm$core$Basics$mul(rSum),
+																$lue_bird$elm_xy$Xy$direction(
+																	$elm$core$Basics$turns((i + 1) / splitCount))),
+															biggest.position),
+														v: function () {
+															var splitAngle = $lue_bird$elm_xy$Xy$toAngle(
 																A2(
-																	$elm$core$List$filter,
-																	function (_v14) {
-																		var r = _v14.r;
-																		return r < 120;
+																	$lue_bird$elm_xy$Xy$map,
+																	function (aspect) {
+																		return A2(avg, aspect, splitters);
 																	},
-																	A2(
-																		$elm$core$List$map,
-																		function (ex) {
-																			return _Utils_update(
-																				ex,
-																				{r: ex.r + 3});
-																		},
-																		playing.explosions))),
-															planets: _Utils_Tuple2(head, tail)
-														}));
-											} else {
-												return $author$project$Main$GameOver;
-											}
-										} else {
-											return $author$project$Main$GameOver;
-										}
-									}(),
-									timePlayed: model.timePlayed + 1
-								}),
-							function () {
-								if (collidedPlanets.b) {
-									var player__ = collidedPlanets.a;
-									return (!A2($elm$core$Basics$modBy, 17, millis)) ? A2(
-										$elm$random$Random$generate,
-										$author$project$Main$PlanetGenerated,
-										$author$project$Main$randomPlanet(
-											{atLeast: 120, awayFrom: player__.position})) : ((!A2($elm$core$Basics$modBy, 23, millis)) ? A2(
-										$elm$random$Random$generate,
-										$author$project$Main$StarsGenerated,
+																	_Utils_Tuple2(
+																		A2(
+																			$elm$core$Basics$composeR,
+																			function ($) {
+																				return $.v;
+																			},
+																			$lue_bird$elm_xy$Xy$x),
+																		A2(
+																			$elm$core$Basics$composeR,
+																			function ($) {
+																				return $.v;
+																			},
+																			$lue_bird$elm_xy$Xy$y))));
+															return A2(
+																$lue_bird$elm_xy$Xy$map,
+																$elm$core$Basics$mul(5.3),
+																$lue_bird$elm_xy$Xy$direction(
+																	(splitAngle + $elm$core$Basics$turns(1 / 4)) + $elm$core$Basics$turns((i + 1) / splitCount)));
+														}()
+													});
+											},
+											A2($elm$core$List$range, 0, splitCount - 1)));
+									} else {
+										return _List_fromArray(
+											[planet]);
+									}
+								}();
+								return A2(
+									$elm$core$Maybe$withDefault,
+									newPlanets,
+									A2(
+										$elm$core$Maybe$map,
 										A2(
-											$elm$random$Random$list,
-											540,
-											$author$project$Main$randomStar(
-												{atLeast: 120, awayFrom: player__.position}))) : $elm$core$Platform$Cmd$none);
-								} else {
-									return $elm$core$Platform$Cmd$none;
-								}
-							}(),
-							$MartinSStewart$elm_audio$Audio$cmdNone);
-					} else {
-						return _Utils_Tuple3(model, $elm$core$Platform$Cmd$none, $MartinSStewart$elm_audio$Audio$cmdNone);
+											$elm$core$Basics$composeR,
+											collide,
+											function (planets_) {
+												return _Utils_ap(newPlanets, planets_);
+											}),
+										A2(
+											$turboMaCk$non_empty_list_alias$List$NonEmpty$filter,
+											A2(
+												$elm$core$Basics$composeL,
+												$elm$core$Basics$not,
+												overlap(planet)),
+											planets)));
+							};
+							var arrows = A2(
+								$lue_bird$elm_xy$Xy$map,
+								$elm$core$Basics$toFloat,
+								$lue_bird$elm_xy$Xy$fromXY(
+									$ohanhi$keyboard$Keyboard$Arrows$arrows(model.pressedKeys)));
+							var _v10 = model.planets;
+							var player_ = _v10.a;
+							var nonPlayerPlanets = _v10.b;
+							var planetsUpdatedPlayer = _Utils_Tuple2(
+								A2(
+									$author$project$Main$mapV,
+									A2(
+										$lue_bird$elm_xy$Xy$map2,
+										$elm$core$Basics$add,
+										A2(
+											$lue_bird$elm_xy$Xy$map,
+											$elm$core$Basics$mul(0.84),
+											arrows)),
+									player_),
+								nonPlayerPlanets);
+							var planetsMoved = A2(
+								$turboMaCk$non_empty_list_alias$List$NonEmpty$map,
+								updatePlanet,
+								planetsWithGravity(planetsUpdatedPlayer));
+							var newExplosions = A2(
+								$elm$core$List$map,
+								function (_v16) {
+									var r = _v16.r;
+									var position = _v16.position;
+									var color = _v16.color;
+									return {color: color, position: position, r: r};
+								},
+								overlaps(planetsMoved));
+							var _v11 = planetsMoved;
+							var movedPlayer = _v11.a;
+							var movedPlanets = _v11.b;
+							var collidedPlanets = collide(
+								updateTail(
+									_Utils_Tuple2(
+										movedPlayer,
+										A2(
+											$elm$core$List$filter,
+											function (planet) {
+												return A2($author$project$Main$distance, planet, movedPlayer) < 400;
+											},
+											movedPlanets))));
+							return _Utils_Tuple3(
+								function () {
+									if (collidedPlanets.b) {
+										var head = collidedPlanets.a;
+										var tail = collidedPlanets.b;
+										var _v13 = head.isPlayer;
+										if (_v13.$ === 'Player') {
+											return _Utils_update(
+												model,
+												{
+													explosions: _Utils_ap(
+														newExplosions,
+														A2(
+															$elm$core$List$filter,
+															function (_v14) {
+																var r = _v14.r;
+																return r < 120;
+															},
+															A2(
+																$elm$core$List$map,
+																function (ex) {
+																	return _Utils_update(
+																		ex,
+																		{r: ex.r + 3});
+																},
+																model.explosions))),
+													planets: _Utils_Tuple2(head, tail),
+													timePlayed: model.timePlayed + 1
+												});
+										} else {
+											return _Utils_update(
+												model,
+												{
+													gameStage: $author$project$Main$FinalExplosion(
+														{
+															r: $author$project$Main$player(model.planets).r
+														})
+												});
+										}
+									} else {
+										return _Utils_update(
+											model,
+											{
+												gameStage: $author$project$Main$FinalExplosion(
+													{
+														r: $author$project$Main$player(model.planets).r
+													})
+											});
+									}
+								}(),
+								function () {
+									if (collidedPlanets.b) {
+										var player__ = collidedPlanets.a;
+										return (!A2($elm$core$Basics$modBy, 17, millis)) ? A2(
+											$elm$random$Random$generate,
+											$author$project$Main$PlanetGenerated,
+											$author$project$Main$randomPlanet(
+												{atLeast: 120, awayFrom: player__.position})) : ((!A2($elm$core$Basics$modBy, 23, millis)) ? A2(
+											$elm$random$Random$generate,
+											$author$project$Main$StarsGenerated,
+											A2(
+												$elm$random$Random$list,
+												540,
+												$author$project$Main$randomStar(
+													{atLeast: 120, awayFrom: player__.position}))) : $elm$core$Platform$Cmd$none);
+									} else {
+										return $elm$core$Platform$Cmd$none;
+									}
+								}(),
+								$MartinSStewart$elm_audio$Audio$cmdNone);
+						case 'FinalExplosion':
+							var explosion = _v3.a;
+							return _Utils_Tuple3(
+								_Utils_update(
+									model,
+									{
+										gameStage: (explosion.r < 120) ? $author$project$Main$FinalExplosion(
+											_Utils_update(
+												explosion,
+												{r: explosion.r + 4.4})) : $author$project$Main$GameOver
+									}),
+								$elm$core$Platform$Cmd$none,
+								$MartinSStewart$elm_audio$Audio$cmdNone);
+						default:
+							return _Utils_Tuple3(model, $elm$core$Platform$Cmd$none, $MartinSStewart$elm_audio$Audio$cmdNone);
 					}
 				};
 			case 'KeyMsg':
@@ -9163,29 +9184,18 @@ var $author$project$Main$update = F2(
 				var planet = msg.a;
 				return function (model) {
 					return _Utils_Tuple3(
-						_Utils_update(
-							model,
-							{
-								gameStage: function () {
-									var _v17 = model.gameStage;
-									if (_v17.$ === 'Playing') {
-										var playing = _v17.a;
-										var _v18 = playing.planets;
-										var player_ = _v18.a;
-										var tail = _v18.b;
-										return $author$project$Main$Playing(
-											_Utils_update(
-												playing,
-												{
-													planets: _Utils_Tuple2(
-														player_,
-														A2($elm$core$List$cons, planet, tail))
-												}));
-									} else {
-										return $author$project$Main$GameOver;
-									}
-								}()
-							}),
+						function () {
+							var _v17 = model.planets;
+							var player_ = _v17.a;
+							var tail = _v17.b;
+							return _Utils_update(
+								model,
+								{
+									planets: _Utils_Tuple2(
+										player_,
+										A2($elm$core$List$cons, planet, tail))
+								});
+						}(),
 						$elm$core$Platform$Cmd$none,
 						$MartinSStewart$elm_audio$Audio$cmdNone);
 				};
@@ -9193,34 +9203,21 @@ var $author$project$Main$update = F2(
 				var newStars = msg.a;
 				return function (model) {
 					return _Utils_Tuple3(
-						function () {
-							var _v19 = model.gameStage;
-							if (_v19.$ === 'Playing') {
-								var playing = _v19.a;
-								return _Utils_update(
-									model,
-									{
-										gameStage: $author$project$Main$Playing(
-											_Utils_update(
-												playing,
-												{
-													stars: function () {
-														var player_ = $author$project$Main$player(playing.planets);
-														return _Utils_ap(
-															newStars,
-															A2(
-																$elm$core$List$filter,
-																function (star) {
-																	return A2($author$project$Main$distance, star, player_) < 120;
-																},
-																playing.stars));
-													}()
-												}))
-									});
-							} else {
-								return model;
-							}
-						}(),
+						_Utils_update(
+							model,
+							{
+								stars: function () {
+									var player_ = $author$project$Main$player(model.planets);
+									return _Utils_ap(
+										newStars,
+										A2(
+											$elm$core$List$filter,
+											function (star) {
+												return A2($author$project$Main$distance, star, player_) < 120;
+											},
+											model.stars));
+								}()
+							}),
 						$elm$core$Platform$Cmd$none,
 						$MartinSStewart$elm_audio$Audio$cmdNone);
 				};
@@ -9238,6 +9235,10 @@ var $author$project$Main$update = F2(
 				};
 		}
 	});
+var $timjs$elm_collage$Collage$Core$Circle = function (a) {
+	return {$: 'Circle', a: a};
+};
+var $timjs$elm_collage$Collage$circle = $timjs$elm_collage$Collage$Core$Circle;
 var $mdgriffith$elm_ui$Internal$Model$Colored = F3(
 	function (a, b, c) {
 		return {$: 'Colored', a: a, b: b, c: c};
@@ -9278,48 +9279,6 @@ var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 			'background-color',
 			clr));
 };
-var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
-	return {$: 'Fill', a: a};
-};
-var $mdgriffith$elm_ui$Element$fill = $mdgriffith$elm_ui$Internal$Model$Fill(1);
-var $mdgriffith$elm_ui$Internal$Model$Height = function (a) {
-	return {$: 'Height', a: a};
-};
-var $mdgriffith$elm_ui$Element$height = $mdgriffith$elm_ui$Internal$Model$Height;
-var $mdgriffith$elm_ui$Internal$Model$Unstyled = function (a) {
-	return {$: 'Unstyled', a: a};
-};
-var $elm$core$Basics$always = F2(
-	function (a, _v0) {
-		return a;
-	});
-var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
-var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
-var $mdgriffith$elm_ui$Internal$Model$Attr = function (a) {
-	return {$: 'Attr', a: a};
-};
-var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
-var $mdgriffith$elm_ui$Internal$Style$classes = {above: 'a', active: 'atv', alignBottom: 'ab', alignCenterX: 'cx', alignCenterY: 'cy', alignContainerBottom: 'acb', alignContainerCenterX: 'accx', alignContainerCenterY: 'accy', alignContainerRight: 'acr', alignLeft: 'al', alignRight: 'ar', alignTop: 'at', alignedHorizontally: 'ah', alignedVertically: 'av', any: 's', behind: 'bh', below: 'b', bold: 'w7', borderDashed: 'bd', borderDotted: 'bdt', borderNone: 'bn', borderSolid: 'bs', capturePointerEvents: 'cpe', clip: 'cp', clipX: 'cpx', clipY: 'cpy', column: 'c', container: 'ctr', contentBottom: 'cb', contentCenterX: 'ccx', contentCenterY: 'ccy', contentLeft: 'cl', contentRight: 'cr', contentTop: 'ct', cursorPointer: 'cptr', cursorText: 'ctxt', focus: 'fcs', focusedWithin: 'focus-within', fullSize: 'fs', grid: 'g', hasBehind: 'hbh', heightContent: 'hc', heightExact: 'he', heightFill: 'hf', heightFillPortion: 'hfp', hover: 'hv', imageContainer: 'ic', inFront: 'fr', inputLabel: 'lbl', inputMultiline: 'iml', inputMultilineFiller: 'imlf', inputMultilineParent: 'imlp', inputMultilineWrapper: 'implw', inputText: 'it', italic: 'i', link: 'lnk', nearby: 'nb', noTextSelection: 'notxt', onLeft: 'ol', onRight: 'or', opaque: 'oq', overflowHidden: 'oh', page: 'pg', paragraph: 'p', passPointerEvents: 'ppe', root: 'ui', row: 'r', scrollbars: 'sb', scrollbarsX: 'sbx', scrollbarsY: 'sby', seButton: 'sbt', single: 'e', sizeByCapital: 'cap', spaceEvenly: 'sev', strike: 'sk', text: 't', textCenter: 'tc', textExtraBold: 'w8', textExtraLight: 'w2', textHeavy: 'w9', textJustify: 'tj', textJustifyAll: 'tja', textLeft: 'tl', textLight: 'w3', textMedium: 'w5', textNormalWeight: 'w4', textRight: 'tr', textSemiBold: 'w6', textThin: 'w1', textUnitalicized: 'tun', transition: 'ts', transparent: 'clr', underline: 'u', widthContent: 'wc', widthExact: 'we', widthFill: 'wf', widthFillPortion: 'wfp', wrapped: 'wrp'};
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $mdgriffith$elm_ui$Internal$Model$htmlClass = function (cls) {
-	return $mdgriffith$elm_ui$Internal$Model$Attr(
-		$elm$html$Html$Attributes$class(cls));
-};
-var $mdgriffith$elm_ui$Internal$Model$OnlyDynamic = F2(
-	function (a, b) {
-		return {$: 'OnlyDynamic', a: a, b: b};
-	});
-var $mdgriffith$elm_ui$Internal$Model$StaticRootAndDynamic = F2(
-	function (a, b) {
-		return {$: 'StaticRootAndDynamic', a: a, b: b};
-	});
 var $mdgriffith$elm_ui$Internal$Model$Unkeyed = function (a) {
 	return {$: 'Unkeyed', a: a};
 };
@@ -9328,6 +9287,7 @@ var $mdgriffith$elm_ui$Internal$Model$asEl = $mdgriffith$elm_ui$Internal$Model$A
 var $mdgriffith$elm_ui$Internal$Model$Generic = {$: 'Generic'};
 var $mdgriffith$elm_ui$Internal$Model$div = $mdgriffith$elm_ui$Internal$Model$Generic;
 var $mdgriffith$elm_ui$Internal$Model$NoNearbyChildren = {$: 'NoNearbyChildren'};
+var $mdgriffith$elm_ui$Internal$Style$classes = {above: 'a', active: 'atv', alignBottom: 'ab', alignCenterX: 'cx', alignCenterY: 'cy', alignContainerBottom: 'acb', alignContainerCenterX: 'accx', alignContainerCenterY: 'accy', alignContainerRight: 'acr', alignLeft: 'al', alignRight: 'ar', alignTop: 'at', alignedHorizontally: 'ah', alignedVertically: 'av', any: 's', behind: 'bh', below: 'b', bold: 'w7', borderDashed: 'bd', borderDotted: 'bdt', borderNone: 'bn', borderSolid: 'bs', capturePointerEvents: 'cpe', clip: 'cp', clipX: 'cpx', clipY: 'cpy', column: 'c', container: 'ctr', contentBottom: 'cb', contentCenterX: 'ccx', contentCenterY: 'ccy', contentLeft: 'cl', contentRight: 'cr', contentTop: 'ct', cursorPointer: 'cptr', cursorText: 'ctxt', focus: 'fcs', focusedWithin: 'focus-within', fullSize: 'fs', grid: 'g', hasBehind: 'hbh', heightContent: 'hc', heightExact: 'he', heightFill: 'hf', heightFillPortion: 'hfp', hover: 'hv', imageContainer: 'ic', inFront: 'fr', inputLabel: 'lbl', inputMultiline: 'iml', inputMultilineFiller: 'imlf', inputMultilineParent: 'imlp', inputMultilineWrapper: 'implw', inputText: 'it', italic: 'i', link: 'lnk', nearby: 'nb', noTextSelection: 'notxt', onLeft: 'ol', onRight: 'or', opaque: 'oq', overflowHidden: 'oh', page: 'pg', paragraph: 'p', passPointerEvents: 'ppe', root: 'ui', row: 'r', scrollbars: 'sb', scrollbarsX: 'sbx', scrollbarsY: 'sby', seButton: 'sbt', single: 'e', sizeByCapital: 'cap', spaceEvenly: 'sev', strike: 'sk', text: 't', textCenter: 'tc', textExtraBold: 'w8', textExtraLight: 'w2', textHeavy: 'w9', textJustify: 'tj', textJustifyAll: 'tja', textLeft: 'tl', textLight: 'w3', textMedium: 'w5', textNormalWeight: 'w4', textRight: 'tr', textSemiBold: 'w6', textThin: 'w1', textUnitalicized: 'tun', transition: 'ts', transparent: 'clr', underline: 'u', widthContent: 'wc', widthExact: 'we', widthFill: 'wf', widthFillPortion: 'wfp', wrapped: 'wrp'};
 var $mdgriffith$elm_ui$Internal$Model$columnClass = $mdgriffith$elm_ui$Internal$Style$classes.any + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.column);
 var $mdgriffith$elm_ui$Internal$Model$gridClass = $mdgriffith$elm_ui$Internal$Style$classes.any + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.grid);
 var $mdgriffith$elm_ui$Internal$Model$pageClass = $mdgriffith$elm_ui$Internal$Style$classes.any + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.page);
@@ -9356,6 +9316,9 @@ var $mdgriffith$elm_ui$Internal$Model$Keyed = function (a) {
 var $mdgriffith$elm_ui$Internal$Model$NoStyleSheet = {$: 'NoStyleSheet'};
 var $mdgriffith$elm_ui$Internal$Model$Styled = function (a) {
 	return {$: 'Styled', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$Unstyled = function (a) {
+	return {$: 'Unstyled', a: a};
 };
 var $mdgriffith$elm_ui$Internal$Model$addChildren = F2(
 	function (existing, nearbyChildren) {
@@ -9427,6 +9390,14 @@ var $mdgriffith$elm_ui$Internal$Flag$alignBottom = $mdgriffith$elm_ui$Internal$F
 var $mdgriffith$elm_ui$Internal$Flag$alignRight = $mdgriffith$elm_ui$Internal$Flag$flag(40);
 var $mdgriffith$elm_ui$Internal$Flag$centerX = $mdgriffith$elm_ui$Internal$Flag$flag(42);
 var $mdgriffith$elm_ui$Internal$Flag$centerY = $mdgriffith$elm_ui$Internal$Flag$flag(43);
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$Set$Set_elm_builtin = function (a) {
 	return {$: 'Set_elm_builtin', a: a};
@@ -14630,6 +14601,127 @@ var $mdgriffith$elm_ui$Internal$Model$element = F4(
 				$mdgriffith$elm_ui$Internal$Model$NoNearbyChildren,
 				$elm$core$List$reverse(attributes)));
 	});
+var $mdgriffith$elm_ui$Internal$Model$Height = function (a) {
+	return {$: 'Height', a: a};
+};
+var $mdgriffith$elm_ui$Element$height = $mdgriffith$elm_ui$Internal$Model$Height;
+var $mdgriffith$elm_ui$Internal$Model$Content = {$: 'Content'};
+var $mdgriffith$elm_ui$Element$shrink = $mdgriffith$elm_ui$Internal$Model$Content;
+var $mdgriffith$elm_ui$Internal$Model$Width = function (a) {
+	return {$: 'Width', a: a};
+};
+var $mdgriffith$elm_ui$Element$width = $mdgriffith$elm_ui$Internal$Model$Width;
+var $mdgriffith$elm_ui$Element$el = F2(
+	function (attrs, child) {
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asEl,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
+					attrs)),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
+				_List_fromArray(
+					[child])));
+	});
+var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
+	return {$: 'Fill', a: a};
+};
+var $mdgriffith$elm_ui$Element$fill = $mdgriffith$elm_ui$Internal$Model$Fill(1);
+var $timjs$elm_collage$Collage$Flat = {$: 'Flat'};
+var $timjs$elm_collage$Collage$Sharp = {$: 'Sharp'};
+var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
+var $timjs$elm_collage$Collage$thin = 2.0;
+var $timjs$elm_collage$Collage$Core$Uniform = function (a) {
+	return {$: 'Uniform', a: a};
+};
+var $timjs$elm_collage$Collage$uniform = $timjs$elm_collage$Collage$Core$Uniform;
+var $timjs$elm_collage$Collage$defaultLineStyle = {
+	cap: $timjs$elm_collage$Collage$Flat,
+	dashPattern: _List_Nil,
+	dashPhase: 0,
+	fill: $timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black),
+	join: $timjs$elm_collage$Collage$Sharp,
+	thickness: $timjs$elm_collage$Collage$thin
+};
+var $timjs$elm_collage$Collage$broken = F3(
+	function (dashes, thickness, fill) {
+		return _Utils_update(
+			$timjs$elm_collage$Collage$defaultLineStyle,
+			{dashPattern: dashes, fill: fill, thickness: thickness});
+	});
+var $timjs$elm_collage$Collage$solid = $timjs$elm_collage$Collage$broken(_List_Nil);
+var $timjs$elm_collage$Collage$Core$Transparent = {$: 'Transparent'};
+var $timjs$elm_collage$Collage$transparent = $timjs$elm_collage$Collage$Core$Transparent;
+var $timjs$elm_collage$Collage$invisible = A2($timjs$elm_collage$Collage$solid, 0, $timjs$elm_collage$Collage$transparent);
+var $timjs$elm_collage$Collage$Core$Shape = F2(
+	function (a, b) {
+		return {$: 'Shape', a: a, b: b};
+	});
+var $timjs$elm_collage$Collage$Core$collage = function (basic) {
+	return {
+		basic: basic,
+		handlers: _List_Nil,
+		name: $elm$core$Maybe$Nothing,
+		opacity: 1,
+		rotation: 0,
+		scale: _Utils_Tuple2(1, 1),
+		shift: _Utils_Tuple2(0, 0)
+	};
+};
+var $timjs$elm_collage$Collage$styled = function (style) {
+	return A2(
+		$elm$core$Basics$composeL,
+		$timjs$elm_collage$Collage$Core$collage,
+		$timjs$elm_collage$Collage$Core$Shape(style));
+};
+var $timjs$elm_collage$Collage$filled = function (fill) {
+	return $timjs$elm_collage$Collage$styled(
+		_Utils_Tuple2(fill, $timjs$elm_collage$Collage$invisible));
+};
+var $elm$core$Basics$always = F2(
+	function (a, _v0) {
+		return a;
+	});
+var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
+var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
+var $mdgriffith$elm_ui$Internal$Model$Attr = function (a) {
+	return {$: 'Attr', a: a};
+};
+var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
+var $mdgriffith$elm_ui$Internal$Model$InFront = {$: 'InFront'};
+var $mdgriffith$elm_ui$Internal$Model$Nearby = F2(
+	function (a, b) {
+		return {$: 'Nearby', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Model$NoAttribute = {$: 'NoAttribute'};
+var $mdgriffith$elm_ui$Element$createNearby = F2(
+	function (loc, element) {
+		if (element.$ === 'Empty') {
+			return $mdgriffith$elm_ui$Internal$Model$NoAttribute;
+		} else {
+			return A2($mdgriffith$elm_ui$Internal$Model$Nearby, loc, element);
+		}
+	});
+var $mdgriffith$elm_ui$Element$inFront = function (element) {
+	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$InFront, element);
+};
+var $mdgriffith$elm_ui$Internal$Model$htmlClass = function (cls) {
+	return $mdgriffith$elm_ui$Internal$Model$Attr(
+		$elm$html$Html$Attributes$class(cls));
+};
+var $mdgriffith$elm_ui$Internal$Model$OnlyDynamic = F2(
+	function (a, b) {
+		return {$: 'OnlyDynamic', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Model$StaticRootAndDynamic = F2(
+	function (a, b) {
+		return {$: 'StaticRootAndDynamic', a: a, b: b};
+	});
 var $mdgriffith$elm_ui$Internal$Model$AllowHover = {$: 'AllowHover'};
 var $mdgriffith$elm_ui$Internal$Model$Layout = {$: 'Layout'};
 var $mdgriffith$elm_ui$Internal$Model$Rgba = F4(
@@ -14887,6 +14979,11 @@ var $mdgriffith$elm_ui$Element$rgb = F3(
 	function (r, g, b) {
 		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, r, g, b, 1);
 	});
+var $avh4$elm_color$Color$rgba = F4(
+	function (r, g, b, a) {
+		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, a);
+	});
+var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
 var $elm$core$List$singleton = function (value) {
 	return _List_fromArray(
 		[value]);
@@ -14914,9 +15011,6 @@ var $timjs$elm_collage$Collage$Core$Path = F2(
 	function (a, b) {
 		return {$: 'Path', a: a, b: b};
 	});
-var $timjs$elm_collage$Collage$Core$Uniform = function (a) {
-	return {$: 'Uniform', a: a};
-};
 var $timjs$elm_collage$Collage$Render$decodeCap = function (cap) {
 	switch (cap.$) {
 		case 'Round':
@@ -15525,29 +15619,6 @@ var $timjs$elm_collage$Collage$Render$svgBox = F2(
 				collage));
 	});
 var $timjs$elm_collage$Collage$Round = {$: 'Round'};
-var $timjs$elm_collage$Collage$Flat = {$: 'Flat'};
-var $timjs$elm_collage$Collage$Sharp = {$: 'Sharp'};
-var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
-var $timjs$elm_collage$Collage$thin = 2.0;
-var $timjs$elm_collage$Collage$uniform = $timjs$elm_collage$Collage$Core$Uniform;
-var $timjs$elm_collage$Collage$defaultLineStyle = {
-	cap: $timjs$elm_collage$Collage$Flat,
-	dashPattern: _List_Nil,
-	dashPhase: 0,
-	fill: $timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black),
-	join: $timjs$elm_collage$Collage$Sharp,
-	thickness: $timjs$elm_collage$Collage$thin
-};
-var $timjs$elm_collage$Collage$broken = F3(
-	function (dashes, thickness, fill) {
-		return _Utils_update(
-			$timjs$elm_collage$Collage$defaultLineStyle,
-			{dashPattern: dashes, fill: fill, thickness: thickness});
-	});
-var $timjs$elm_collage$Collage$Core$Circle = function (a) {
-	return {$: 'Circle', a: a};
-};
-var $timjs$elm_collage$Collage$circle = $timjs$elm_collage$Collage$Core$Circle;
 var $avh4$elm_color$Color$hsla = F4(
 	function (hue, sat, light, alpha) {
 		var _v0 = _Utils_Tuple3(hue, sat, light);
@@ -15623,35 +15694,6 @@ var $noahzgordon$elm_color_extra$Color$Manipulate$fadeOut = F2(
 	function (offset, cl) {
 		return A2($noahzgordon$elm_color_extra$Color$Manipulate$fadeIn, -offset, cl);
 	});
-var $timjs$elm_collage$Collage$solid = $timjs$elm_collage$Collage$broken(_List_Nil);
-var $timjs$elm_collage$Collage$Core$Transparent = {$: 'Transparent'};
-var $timjs$elm_collage$Collage$transparent = $timjs$elm_collage$Collage$Core$Transparent;
-var $timjs$elm_collage$Collage$invisible = A2($timjs$elm_collage$Collage$solid, 0, $timjs$elm_collage$Collage$transparent);
-var $timjs$elm_collage$Collage$Core$Shape = F2(
-	function (a, b) {
-		return {$: 'Shape', a: a, b: b};
-	});
-var $timjs$elm_collage$Collage$Core$collage = function (basic) {
-	return {
-		basic: basic,
-		handlers: _List_Nil,
-		name: $elm$core$Maybe$Nothing,
-		opacity: 1,
-		rotation: 0,
-		scale: _Utils_Tuple2(1, 1),
-		shift: _Utils_Tuple2(0, 0)
-	};
-};
-var $timjs$elm_collage$Collage$styled = function (style) {
-	return A2(
-		$elm$core$Basics$composeL,
-		$timjs$elm_collage$Collage$Core$collage,
-		$timjs$elm_collage$Collage$Core$Shape(style));
-};
-var $timjs$elm_collage$Collage$filled = function (fill) {
-	return $timjs$elm_collage$Collage$styled(
-		_Utils_Tuple2(fill, $timjs$elm_collage$Collage$invisible));
-};
 var $timjs$elm_collage$Collage$group = A2($elm$core$Basics$composeL, $timjs$elm_collage$Collage$Core$collage, $timjs$elm_collage$Collage$Core$Group);
 var $timjs$elm_collage$Collage$Core$Polygon = function (a) {
 	return {$: 'Polygon', a: a};
@@ -15689,10 +15731,6 @@ var $timjs$elm_collage$Collage$rectangle = F2(
 	function (w, h) {
 		return A3($timjs$elm_collage$Collage$roundedRectangle, w, h, 0);
 	});
-var $avh4$elm_color$Color$rgba = F4(
-	function (r, g, b, a) {
-		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, a);
-	});
 var $timjs$elm_collage$Collage$rotate = F2(
 	function (t, collage) {
 		return _Utils_update(
@@ -15724,214 +15762,213 @@ var $timjs$elm_collage$Collage$traced = F2(
 		return $timjs$elm_collage$Collage$Core$collage(
 			A2($timjs$elm_collage$Collage$Core$Path, linestyle, p));
 	});
-var $author$project$Main$view = F2(
-	function (_v0, _v1) {
-		var windowSize = _v0.windowSize;
-		var stars = _v1.stars;
-		var explosions = _v1.explosions;
-		var planets = _v1.planets;
-		var viewTail = function (_v6) {
-			var tail = _v6.tail;
-			var color = _v6.color;
-			var r = _v6.r;
-			return $timjs$elm_collage$Collage$group(
-				A2(
-					$elm$core$List$map,
-					function (traceStyle) {
-						return A2(
-							$timjs$elm_collage$Collage$traced,
-							traceStyle,
-							$timjs$elm_collage$Collage$path(tail));
-					},
-					_List_fromArray(
-						[
-							A2(
-							$timjs$elm_collage$Collage$solid,
-							r * 2,
-							$timjs$elm_collage$Collage$uniform(
-								A2($noahzgordon$elm_color_extra$Color$Manipulate$fadeOut, 0.972, color))),
-							A2(
-							$timjs$elm_collage$Collage$solid,
-							0.07,
-							$timjs$elm_collage$Collage$uniform(
-								A2($noahzgordon$elm_color_extra$Color$Manipulate$fadeOut, 0.45, color)))
-						])));
-		};
-		var viewStar = function (_v5) {
-			var position = _v5.position;
-			var r = _v5.r;
-			var viewTriangle = A2(
-				$timjs$elm_collage$Collage$filled,
-				$timjs$elm_collage$Collage$uniform(
-					A4($avh4$elm_color$Color$rgba, 1, 1, 1, 0.5)),
-				A2($timjs$elm_collage$Collage$ngon, 3, r));
-			return A2(
-				$timjs$elm_collage$Collage$shift,
-				position,
-				$timjs$elm_collage$Collage$group(
-					_List_fromArray(
-						[
-							viewTriangle,
-							A2(
-							$timjs$elm_collage$Collage$rotate,
-							$elm$core$Basics$turns(1 / 6),
-							viewTriangle)
-						])));
-		};
-		var viewPlanet = function (planet) {
-			var orbits = 5;
-			return $timjs$elm_collage$Collage$group(
-				A2(
-					$elm$core$List$cons,
-					function () {
-						var _v4 = planet.whenHit;
-						switch (_v4.$) {
-							case 'Join':
-								return A2(
-									$timjs$elm_collage$Collage$filled,
-									$timjs$elm_collage$Collage$uniform(planet.color),
-									$timjs$elm_collage$Collage$circle(planet.r));
-							case 'Kill':
-								return A2(
-									$timjs$elm_collage$Collage$outlined,
-									A2(
-										$timjs$elm_collage$Collage$solid,
-										planet.r / 2,
-										$timjs$elm_collage$Collage$uniform(
-											A2($noahzgordon$elm_color_extra$Color$Manipulate$darken, 0.04, planet.color))),
-									A2($timjs$elm_collage$Collage$ngon, 5, planet.r));
-							default:
-								return A2(
-									$timjs$elm_collage$Collage$rotate,
-									$lue_bird$elm_xy$Xy$toAngle(planet.v) + $elm$core$Basics$turns(1 / 12),
-									A2(
-										$timjs$elm_collage$Collage$filled,
-										$timjs$elm_collage$Collage$uniform(planet.color),
-										A2($timjs$elm_collage$Collage$ngon, 3, planet.r)));
-						}
-					}(),
-					A2(
-						$elm$core$List$map,
-						function (orbit) {
+var $author$project$Main$view = function (_v0) {
+	var windowSize = _v0.windowSize;
+	var stars = _v0.stars;
+	var explosions = _v0.explosions;
+	var planets = _v0.planets;
+	var viewTail = function (_v5) {
+		var tail = _v5.tail;
+		var color = _v5.color;
+		var r = _v5.r;
+		return $timjs$elm_collage$Collage$group(
+			A2(
+				$elm$core$List$map,
+				function (traceStyle) {
+					return A2(
+						$timjs$elm_collage$Collage$traced,
+						traceStyle,
+						$timjs$elm_collage$Collage$path(tail));
+				},
+				_List_fromArray(
+					[
+						A2(
+						$timjs$elm_collage$Collage$solid,
+						r * 2,
+						$timjs$elm_collage$Collage$uniform(
+							A2($noahzgordon$elm_color_extra$Color$Manipulate$fadeOut, 0.972, color))),
+						A2(
+						$timjs$elm_collage$Collage$solid,
+						0.07,
+						$timjs$elm_collage$Collage$uniform(
+							A2($noahzgordon$elm_color_extra$Color$Manipulate$fadeOut, 0.45, color)))
+					])));
+	};
+	var viewStar = function (_v4) {
+		var position = _v4.position;
+		var r = _v4.r;
+		var viewTriangle = A2(
+			$timjs$elm_collage$Collage$filled,
+			$timjs$elm_collage$Collage$uniform(
+				A4($avh4$elm_color$Color$rgba, 1, 1, 1, 0.5)),
+			A2($timjs$elm_collage$Collage$ngon, 3, r));
+		return A2(
+			$timjs$elm_collage$Collage$shift,
+			position,
+			$timjs$elm_collage$Collage$group(
+				_List_fromArray(
+					[
+						viewTriangle,
+						A2(
+						$timjs$elm_collage$Collage$rotate,
+						$elm$core$Basics$turns(1 / 6),
+						viewTriangle)
+					])));
+	};
+	var viewPlanet = function (planet) {
+		var orbits = 5;
+		return $timjs$elm_collage$Collage$group(
+			A2(
+				$elm$core$List$cons,
+				function () {
+					var _v3 = planet.whenHit;
+					switch (_v3.$) {
+						case 'Join':
+							return A2(
+								$timjs$elm_collage$Collage$filled,
+								$timjs$elm_collage$Collage$uniform(planet.color),
+								$timjs$elm_collage$Collage$circle(planet.r));
+						case 'Kill':
 							return A2(
 								$timjs$elm_collage$Collage$outlined,
-								function (style) {
-									return _Utils_update(
-										style,
-										{cap: $timjs$elm_collage$Collage$Round});
-								}(
-									A3(
-										$timjs$elm_collage$Collage$broken,
-										_List_fromArray(
-											[
-												_Utils_Tuple2(
-												$elm$core$Basics$round(((planet.r * 2) * $elm$core$Basics$pi) - 32),
-												32)
-											]),
-										2,
-										$timjs$elm_collage$Collage$uniform(
-											A4($avh4$elm_color$Color$rgba, 1, 1, 1, 0.025 - ((0.025 * orbit) / orbits))))),
-								$timjs$elm_collage$Collage$circle(
-									planet.r + (A2($elm$core$Basics$pow, orbit, 3) * 0.7)));
-						},
-						A2($elm$core$List$range, 1, orbits))));
-		};
-		var viewExplosion = function (_v3) {
-			var r = _v3.r;
-			var color = _v3.color;
-			var position = _v3.position;
-			return A2(
-				$timjs$elm_collage$Collage$shift,
-				position,
-				$timjs$elm_collage$Collage$group(
-					_List_fromArray(
-						[
-							A2(
-							$timjs$elm_collage$Collage$traced,
-							A2(
-								$timjs$elm_collage$Collage$solid,
-								1,
-								$timjs$elm_collage$Collage$uniform(
-									A2(
-										$noahzgordon$elm_color_extra$Color$Manipulate$fadeOut,
-										1 - (0.2 / A2($elm$core$Basics$pow, r, 1.2)),
-										color))),
-							$timjs$elm_collage$Collage$path(
 								A2(
-									$elm$core$List$map,
-									function (i) {
-										return A2(
-											$lue_bird$elm_xy$Xy$map,
-											$elm$core$Basics$mul(
-												(!A2($elm$core$Basics$modBy, 2, i)) ? 0 : (r * 1.7)),
-											$lue_bird$elm_xy$Xy$direction(
-												$elm$core$Basics$turns(i / 34)));
-									},
-									A2($elm$core$List$range, 0, 32)))),
-							A2(
-							$timjs$elm_collage$Collage$filled,
+									$timjs$elm_collage$Collage$solid,
+									planet.r / 2,
+									$timjs$elm_collage$Collage$uniform(
+										A2($noahzgordon$elm_color_extra$Color$Manipulate$darken, 0.04, planet.color))),
+								A2($timjs$elm_collage$Collage$ngon, 5, planet.r));
+						default:
+							return A2(
+								$timjs$elm_collage$Collage$rotate,
+								$lue_bird$elm_xy$Xy$toAngle(planet.v) + $elm$core$Basics$turns(1 / 12),
+								A2(
+									$timjs$elm_collage$Collage$filled,
+									$timjs$elm_collage$Collage$uniform(planet.color),
+									A2($timjs$elm_collage$Collage$ngon, 3, planet.r)));
+					}
+				}(),
+				A2(
+					$elm$core$List$map,
+					function (orbit) {
+						return A2(
+							$timjs$elm_collage$Collage$outlined,
+							function (style) {
+								return _Utils_update(
+									style,
+									{cap: $timjs$elm_collage$Collage$Round});
+							}(
+								A3(
+									$timjs$elm_collage$Collage$broken,
+									_List_fromArray(
+										[
+											_Utils_Tuple2(
+											$elm$core$Basics$round(((planet.r * 2) * $elm$core$Basics$pi) - 32),
+											32)
+										]),
+									2,
+									$timjs$elm_collage$Collage$uniform(
+										A4($avh4$elm_color$Color$rgba, 1, 1, 1, 0.025 - ((0.025 * orbit) / orbits))))),
+							$timjs$elm_collage$Collage$circle(
+								planet.r + (A2($elm$core$Basics$pow, orbit, 3) * 0.7)));
+					},
+					A2($elm$core$List$range, 1, orbits))));
+	};
+	var viewExplosion = function (_v2) {
+		var r = _v2.r;
+		var color = _v2.color;
+		var position = _v2.position;
+		return A2(
+			$timjs$elm_collage$Collage$shift,
+			position,
+			$timjs$elm_collage$Collage$group(
+				_List_fromArray(
+					[
+						A2(
+						$timjs$elm_collage$Collage$traced,
+						A2(
+							$timjs$elm_collage$Collage$solid,
+							1,
 							$timjs$elm_collage$Collage$uniform(
 								A2(
 									$noahzgordon$elm_color_extra$Color$Manipulate$fadeOut,
-									1 - (1 / A2($elm$core$Basics$pow, r, 1.2)),
-									color)),
-							$timjs$elm_collage$Collage$circle(r))
-						])));
-		};
-		var _v2 = planets;
-		var player_ = _v2.a;
-		var planets_ = _v2.b;
-		return $timjs$elm_collage$Collage$group(
-			_List_fromArray(
-				[
-					A2(
-					$timjs$elm_collage$Collage$scale,
-					10,
-					$timjs$elm_collage$Collage$group(
-						_List_fromArray(
-							[
-								viewPlanet(player_),
+									1 - (0.2 / A2($elm$core$Basics$pow, r, 1.2)),
+									color))),
+						$timjs$elm_collage$Collage$path(
+							A2(
+								$elm$core$List$map,
+								function (i) {
+									return A2(
+										$lue_bird$elm_xy$Xy$map,
+										$elm$core$Basics$mul(
+											(!A2($elm$core$Basics$modBy, 2, i)) ? 0 : (r * 1.7)),
+										$lue_bird$elm_xy$Xy$direction(
+											$elm$core$Basics$turns(i / 34)));
+								},
+								A2($elm$core$List$range, 0, 32)))),
+						A2(
+						$timjs$elm_collage$Collage$filled,
+						$timjs$elm_collage$Collage$uniform(
+							A2(
+								$noahzgordon$elm_color_extra$Color$Manipulate$fadeOut,
+								1 - (1 / A2($elm$core$Basics$pow, r, 1.2)),
+								color)),
+						$timjs$elm_collage$Collage$circle(r))
+					])));
+	};
+	var _v1 = planets;
+	var player_ = _v1.a;
+	var planets_ = _v1.b;
+	return $timjs$elm_collage$Collage$group(
+		_List_fromArray(
+			[
+				A2(
+				$timjs$elm_collage$Collage$scale,
+				10,
+				$timjs$elm_collage$Collage$group(
+					_List_fromArray(
+						[
+							viewPlanet(player_),
+							A2(
+							$timjs$elm_collage$Collage$shift,
+							A2(
+								$lue_bird$elm_xy$Xy$map,
+								function (c) {
+									return -c;
+								},
+								player_.position),
+							$timjs$elm_collage$Collage$group(
 								A2(
-								$timjs$elm_collage$Collage$shift,
-								A2(
-									$lue_bird$elm_xy$Xy$map,
-									function (c) {
-										return -c;
-									},
-									player_.position),
-								$timjs$elm_collage$Collage$group(
-									A2(
-										$elm$core$List$cons,
-										viewTail(player_),
+									$elm$core$List$cons,
+									viewTail(player_),
+									_Utils_ap(
+										$elm$core$List$concat(
+											A2(
+												$elm$core$List$map,
+												function (planet) {
+													return _List_fromArray(
+														[
+															viewTail(planet),
+															A2(
+															$timjs$elm_collage$Collage$shift,
+															planet.position,
+															viewPlanet(planet))
+														]);
+												},
+												planets_)),
 										_Utils_ap(
-											$elm$core$List$concat(
-												A2(
-													$elm$core$List$map,
-													function (planet) {
-														return _List_fromArray(
-															[
-																viewTail(planet),
-																A2(
-																$timjs$elm_collage$Collage$shift,
-																planet.position,
-																viewPlanet(planet))
-															]);
-													},
-													planets_)),
-											_Utils_ap(
-												A2($elm$core$List$map, viewStar, stars),
-												A2($elm$core$List$map, viewExplosion, explosions))))))
-							]))),
-					A2(
-					$timjs$elm_collage$Collage$filled,
-					$timjs$elm_collage$Collage$uniform(
-						A3($avh4$elm_color$Color$rgb, 0, 0, 0)),
-					A2(
-						$timjs$elm_collage$Collage$rectangle,
-						$lue_bird$elm_xy$Xy$x(windowSize),
-						$lue_bird$elm_xy$Xy$y(windowSize)))
-				]));
-	});
+											A2($elm$core$List$map, viewStar, stars),
+											A2($elm$core$List$map, viewExplosion, explosions))))))
+						]))),
+				A2(
+				$timjs$elm_collage$Collage$filled,
+				$timjs$elm_collage$Collage$uniform(
+					A3($avh4$elm_color$Color$rgb, 0, 0, 0)),
+				A2(
+					$timjs$elm_collage$Collage$rectangle,
+					$lue_bird$elm_xy$Xy$x(windowSize),
+					$lue_bird$elm_xy$Xy$y(windowSize)))
+			]));
+};
 var $author$project$Main$NewGameClicked = {$: 'NewGameClicked'};
 var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
 	return {$: 'AlignY', a: a};
@@ -15952,7 +15989,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $mdgriffith$elm_ui$Element$Input$enter = 'Enter';
-var $mdgriffith$elm_ui$Internal$Model$NoAttribute = {$: 'NoAttribute'};
 var $mdgriffith$elm_ui$Element$Input$hasFocusStyle = function (attr) {
 	if (((attr.$ === 'StyleClass') && (attr.b.$ === 'PseudoSelector')) && (attr.b.a.$ === 'Focus')) {
 		var _v1 = attr.b;
@@ -16014,8 +16050,6 @@ var $mdgriffith$elm_ui$Internal$Model$Class = F2(
 	});
 var $mdgriffith$elm_ui$Internal$Flag$cursor = $mdgriffith$elm_ui$Internal$Flag$flag(21);
 var $mdgriffith$elm_ui$Element$pointer = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$cursor, $mdgriffith$elm_ui$Internal$Style$classes.cursorPointer);
-var $mdgriffith$elm_ui$Internal$Model$Content = {$: 'Content'};
-var $mdgriffith$elm_ui$Element$shrink = $mdgriffith$elm_ui$Internal$Model$Content;
 var $mdgriffith$elm_ui$Element$Input$space = ' ';
 var $elm$html$Html$Attributes$tabindex = function (n) {
 	return A2(
@@ -16023,10 +16057,6 @@ var $elm$html$Html$Attributes$tabindex = function (n) {
 		'tabIndex',
 		$elm$core$String$fromInt(n));
 };
-var $mdgriffith$elm_ui$Internal$Model$Width = function (a) {
-	return {$: 'Width', a: a};
-};
-var $mdgriffith$elm_ui$Element$width = $mdgriffith$elm_ui$Internal$Model$Width;
 var $mdgriffith$elm_ui$Element$Input$button = F2(
 	function (attrs, _v0) {
 		var onPress = _v0.onPress;
@@ -16119,23 +16149,6 @@ var $mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
-var $mdgriffith$elm_ui$Element$el = F2(
-	function (attrs, child) {
-		return A4(
-			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asEl,
-			$mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
-					attrs)),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(
-				_List_fromArray(
-					[child])));
-	});
 var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
 	function (a, b, c, d, e) {
 		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
@@ -16154,7 +16167,6 @@ var $mdgriffith$elm_ui$Element$padding = function (x) {
 			f,
 			f));
 };
-var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
 var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
 var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
 	return A2(
@@ -16224,7 +16236,7 @@ var $author$project$Main$viewGameOver = function (_v0) {
 							$mdgriffith$elm_ui$Element$alignBottom
 						]),
 					$mdgriffith$elm_ui$Element$text(
-						'☠ score ' + $elm$core$String$fromInt((timePlayed / 24) | 0))),
+						'score ' + $elm$core$String$fromInt((timePlayed / 24) | 0))),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
 					_List_fromArray(
@@ -16245,17 +16257,75 @@ var $author$project$Main$viewDocument = F2(
 	function (_v0, model) {
 		return {
 			body: function () {
+				var viewPlaying = $mdgriffith$elm_ui$Element$html(
+					A2(
+						$timjs$elm_collage$Collage$Render$svgBox,
+						model.windowSize,
+						$author$project$Main$view(model)));
 				var content = function () {
 					var _v1 = model.gameStage;
-					if (_v1.$ === 'Playing') {
-						var playStage = _v1.a;
-						return $mdgriffith$elm_ui$Element$html(
-							A2(
-								$timjs$elm_collage$Collage$Render$svgBox,
-								model.windowSize,
-								A2($author$project$Main$view, model, playStage)));
-					} else {
-						return $author$project$Main$viewGameOver(model);
+					switch (_v1.$) {
+						case 'Playing':
+							return viewPlaying;
+						case 'GameOver':
+							return A2(
+								$mdgriffith$elm_ui$Element$el,
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$inFront(
+										A2(
+											$mdgriffith$elm_ui$Element$el,
+											_List_fromArray(
+												[
+													$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+													$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
+													$mdgriffith$elm_ui$Element$Background$color(
+													A4($mdgriffith$elm_ui$Element$rgba, 0, 0, 0, 0.7))
+												]),
+											$author$project$Main$viewGameOver(model)))
+									]),
+								viewPlaying);
+						default:
+							var r = _v1.a.r;
+							return A2(
+								$mdgriffith$elm_ui$Element$el,
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+										$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill)
+									]),
+								A2(
+									$mdgriffith$elm_ui$Element$el,
+									_List_fromArray(
+										[
+											$mdgriffith$elm_ui$Element$inFront(
+											A2(
+												$mdgriffith$elm_ui$Element$el,
+												_List_fromArray(
+													[
+														$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+														$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
+														$mdgriffith$elm_ui$Element$inFront(
+														A2(
+															$mdgriffith$elm_ui$Element$el,
+															_List_fromArray(
+																[
+																	$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+																	$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill)
+																]),
+															$author$project$Main$viewGameOver(model)))
+													]),
+												$mdgriffith$elm_ui$Element$html(
+													A2(
+														$timjs$elm_collage$Collage$Render$svgBox,
+														model.windowSize,
+														A2(
+															$timjs$elm_collage$Collage$filled,
+															$timjs$elm_collage$Collage$uniform(
+																A4($avh4$elm_color$Color$rgba, 0, 0, 0, 0.7)),
+															$timjs$elm_collage$Collage$circle(r * 10))))))
+										]),
+									viewPlaying));
 					}
 				}();
 				return $elm$core$List$singleton(

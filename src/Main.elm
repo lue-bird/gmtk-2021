@@ -51,15 +51,15 @@ type alias Model =
     , gameStage : GameStage
     , timePlayed : Int -- frames
     , music : Maybe (Result Audio.LoadError Audio.Source)
+    , planets : NonEmpty Planet -- the head is the player
+    , stars : List Star
+    , explosions : List Explosion
     }
 
 
 type GameStage
     = Playing
-        { planets : NonEmpty Planet -- the head is the player
-        , stars : List Star
-        , explosions : List Explosion
-        }
+    | FinalExplosion { r : Float } -- transition to game over
     | GameOver
 
 
@@ -140,22 +140,20 @@ init : ( Model, Cmd Msg, AudioCmd Msg )
 init =
     ( { windowSize = Xy.zero
       , pressedKeys = []
-      , gameStage =
-            { planets =
-                { isPlayer = Player
-                , v = Xy.zero
-                , position = Xy.zero
-                , r = 2.2
-                , color = rgb 1 1 0
-                , whenHit = Join
-                , tail = []
-                , deadTails = []
-                }
-                    |> List.NonEmpty.singleton
-            , stars = []
-            , explosions = []
+      , planets =
+            { isPlayer = Player
+            , v = Xy.zero
+            , position = Xy.zero
+            , r = 2.2
+            , color = rgb 1 1 0
+            , whenHit = Join
+            , tail = []
+            , deadTails = []
             }
-                |> Playing
+                |> List.NonEmpty.singleton
+      , stars = []
+      , explosions = []
+      , gameStage = Playing
       , timePlayed = 0
       , music = Nothing
       }
@@ -206,10 +204,10 @@ update _ msg =
         Frame millis ->
             \model ->
                 case model.gameStage of
-                    Playing playing ->
+                    Playing ->
                         let
                             ( player_, nonPlayerPlanets ) =
-                                playing.planets
+                                model.planets
 
                             updatePlanet planet =
                                 let
@@ -466,30 +464,34 @@ update _ msg =
                                             { r = r, position = position, color = color }
                                         )
                         in
-                        ( { model
-                            | gameStage =
-                                case collidedPlanets of
-                                    head :: tail ->
-                                        case head.isPlayer of
-                                            Player ->
-                                                { playing
-                                                    | planets = ( head, tail )
-                                                    , explosions =
-                                                        playing.explosions
-                                                            |> List.map (\ex -> { ex | r = ex.r + 3 })
-                                                            |> List.filter (\{ r } -> r < 120)
-                                                            |> (++) newExplosions
-                                                }
-                                                    |> Playing
+                        ( case collidedPlanets of
+                            head :: tail ->
+                                case head.isPlayer of
+                                    Player ->
+                                        { model
+                                            | planets = ( head, tail )
+                                            , explosions =
+                                                model.explosions
+                                                    |> List.map (\ex -> { ex | r = ex.r + 3 })
+                                                    |> List.filter (\{ r } -> r < 120)
+                                                    |> (++) newExplosions
+                                            , timePlayed =
+                                                model.timePlayed + 1
+                                        }
 
-                                            NoPlayer ->
-                                                GameOver
+                                    NoPlayer ->
+                                        { model
+                                            | gameStage =
+                                                FinalExplosion
+                                                    { r = player model.planets |> .r }
+                                        }
 
-                                    [] ->
-                                        GameOver
-                            , timePlayed =
-                                model.timePlayed + 1
-                          }
+                            [] ->
+                                { model
+                                    | gameStage =
+                                        FinalExplosion
+                                            { r = player model.planets |> .r }
+                                }
                         , case collidedPlanets of
                             player__ :: _ ->
                                 if (millis |> modBy 17) == 0 then
@@ -515,6 +517,20 @@ update _ msg =
                         , Audio.cmdNone
                         )
 
+                    FinalExplosion explosion ->
+                        ( { model
+                            | gameStage =
+                                if explosion.r < 120 then
+                                    FinalExplosion
+                                        { explosion | r = explosion.r + 4.4 }
+
+                                else
+                                    GameOver
+                          }
+                        , Cmd.none
+                        , Audio.cmdNone
+                        )
+
                     GameOver ->
                         ( model
                         , Cmd.none
@@ -533,21 +549,12 @@ update _ msg =
 
         PlanetGenerated planet ->
             \model ->
-                ( { model
-                    | gameStage =
-                        case model.gameStage of
-                            Playing playing ->
-                                let
-                                    ( player_, tail ) =
-                                        playing.planets
-                                in
-                                { playing
-                                    | planets = ( player_, planet :: tail )
-                                }
-                                    |> Playing
-
-                            GameOver ->
-                                GameOver
+                ( let
+                    ( player_, tail ) =
+                        model.planets
+                  in
+                  { model
+                    | planets = ( player_, planet :: tail )
                   }
                 , Cmd.none
                 , Audio.cmdNone
@@ -555,26 +562,17 @@ update _ msg =
 
         StarsGenerated newStars ->
             \model ->
-                ( case model.gameStage of
-                    Playing playing ->
-                        { model
-                            | gameStage =
-                                { playing
-                                    | stars =
-                                        let
-                                            player_ =
-                                                player playing.planets
-                                        in
-                                        playing.stars
-                                            |> List.filter
-                                                (\star -> distance star player_ < 120)
-                                            |> (++) newStars
-                                }
-                                    |> Playing
-                        }
-
-                    GameOver ->
-                        model
+                ( { model
+                    | stars =
+                        let
+                            player_ =
+                                player model.planets
+                        in
+                        model.stars
+                            |> List.filter
+                                (\star -> distance star player_ < 120)
+                            |> (++) newStars
+                  }
                 , Cmd.none
                 , Audio.cmdNone
                 )
@@ -671,15 +669,54 @@ viewDocument _ model =
     { title = "time to face gravity."
     , body =
         let
+            viewPlaying =
+                view model
+                    |> Collage.Render.svgBox model.windowSize
+                    |> Ui.html
+
             content =
                 case model.gameStage of
-                    Playing playStage ->
-                        view model playStage
-                            |> Collage.Render.svgBox model.windowSize
-                            |> Ui.html
+                    Playing ->
+                        viewPlaying
 
                     GameOver ->
-                        viewGameOver model
+                        viewPlaying
+                            |> Ui.el
+                                [ Ui.inFront
+                                    (viewGameOver model
+                                        |> Ui.el
+                                            [ Ui.width Ui.fill
+                                            , Ui.height Ui.fill
+                                            , Background.color (Ui.rgba 0 0 0 0.7)
+                                            ]
+                                    )
+                                ]
+
+                    FinalExplosion { r } ->
+                        viewPlaying
+                            |> Ui.el
+                                [ Ui.inFront
+                                    (Collage.circle (r * 10)
+                                        |> Collage.filled (Color.rgba 0 0 0 0.7 |> Collage.uniform)
+                                        |> Collage.Render.svgBox model.windowSize
+                                        |> Ui.html
+                                        |> Ui.el
+                                            [ Ui.width Ui.fill
+                                            , Ui.height Ui.fill
+                                            , Ui.inFront
+                                                (viewGameOver model
+                                                    |> Ui.el
+                                                        [ Ui.width Ui.fill
+                                                        , Ui.height Ui.fill
+                                                        ]
+                                                )
+                                            ]
+                                    )
+                                ]
+                            |> Ui.el
+                                [ Ui.width Ui.fill
+                                , Ui.height Ui.fill
+                                ]
         in
         content
             |> Ui.layout
@@ -720,7 +757,7 @@ viewGameOver { timePlayed } =
             ]
 
 
-view { windowSize } { stars, explosions, planets } =
+view { windowSize, stars, explosions, planets } =
     let
         ( player_, planets_ ) =
             planets
@@ -793,20 +830,6 @@ view { windowSize } { stars, explosions, planets } =
                    )
                 |> Collage.group
 
-        viewStar { position, r } =
-            let
-                viewTriangle =
-                    Collage.ngon 3 r
-                        |> Collage.filled
-                            (rgba 1 1 1 0.5 |> Collage.uniform)
-            in
-            [ viewTriangle
-            , viewTriangle
-                |> Collage.rotate (turns (1 / 6))
-            ]
-                |> Collage.group
-                |> Collage.shift position
-
         viewExplosion { r, color, position } =
             [ List.range 0 32
                 |> List.map
@@ -835,6 +858,20 @@ view { windowSize } { stars, explosions, planets } =
                         |> Color.fadeOut (1 - 1 / (r ^ 1.2))
                         |> Collage.uniform
                     )
+            ]
+                |> Collage.group
+                |> Collage.shift position
+
+        viewStar { position, r } =
+            let
+                viewTriangle =
+                    Collage.ngon 3 r
+                        |> Collage.filled
+                            (rgba 1 1 1 0.5 |> Collage.uniform)
+            in
+            [ viewTriangle
+            , viewTriangle
+                |> Collage.rotate (turns (1 / 6))
             ]
                 |> Collage.group
                 |> Collage.shift position

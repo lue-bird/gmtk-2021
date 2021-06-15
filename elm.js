@@ -7505,10 +7505,18 @@ var $author$project$Main$Star = F2(
 var $lue_bird$elm_xy$Xy$both = function (valueOfBothCoordinates) {
 	return A2($lue_bird$elm_xy$Xy$xy, valueOfBothCoordinates, valueOfBothCoordinates);
 };
-var $author$project$Main$xyRandom = function (_v0) {
-	var x = _v0.a;
-	var y = _v0.b;
-	return A3($elm$random$Random$map2, $lue_bird$elm_xy$Xy$xy, x, y);
+var $lue_bird$elm_xy$Xy$to = function (xyToResult) {
+	return function (_v0) {
+		var x_ = _v0.a;
+		var y_ = _v0.b;
+		return A2(xyToResult, x_, y_);
+	};
+};
+var $lue_bird$elm_xy$Xy$random = function (randomCoordinates) {
+	return A2(
+		$lue_bird$elm_xy$Xy$to,
+		$elm$random$Random$map2($lue_bird$elm_xy$Xy$xy),
+		randomCoordinates);
 };
 var $author$project$Main$randomStar = function (_v0) {
 	var awayFrom = _v0.awayFrom;
@@ -7519,7 +7527,7 @@ var $author$project$Main$randomStar = function (_v0) {
 		A2(
 			$elm$random$Random$map,
 			A2($lue_bird$elm_xy$Xy$map2, $elm$core$Basics$add, awayFrom),
-			$author$project$Main$xyRandom(
+			$lue_bird$elm_xy$Xy$random(
 				$lue_bird$elm_xy$Xy$both(
 					$author$project$Main$randomSign(
 						A2($elm$random$Random$float, atLeast, 200))))),
@@ -8109,15 +8117,19 @@ var $lue_bird$elm_xy$Xy$direction = function (radians) {
 		$lue_bird$elm_xy$Xy$both(radians));
 };
 var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$Main$length = function (_v0) {
-	var x = _v0.a;
-	var y = _v0.b;
-	return $elm$core$Basics$sqrt(
-		A2($elm$core$Basics$pow, x, 2) + A2($elm$core$Basics$pow, y, 2));
-};
+var $lue_bird$elm_xy$Xy$length = A2(
+	$elm$core$Basics$composeL,
+	A2(
+		$elm$core$Basics$composeL,
+		$elm$core$Basics$sqrt,
+		$lue_bird$elm_xy$Xy$to($elm$core$Basics$add)),
+	$lue_bird$elm_xy$Xy$map(
+		function (c) {
+			return A2($elm$core$Basics$pow, c, 2);
+		}));
 var $author$project$Main$distance = F2(
 	function (a, b) {
-		return $author$project$Main$length(
+		return $lue_bird$elm_xy$Xy$length(
 			A2($author$project$Main$difference, a.position, b.position));
 	});
 var $turboMaCk$non_empty_list_alias$List$NonEmpty$fromList = function (xs) {
@@ -8176,7 +8188,7 @@ var $turboMaCk$non_empty_list_alias$List$NonEmpty$indexedMap = F2(
 	});
 var $author$project$Main$lengthAtMost = F2(
 	function (maximumLength, xy) {
-		var length_ = $author$project$Main$length(xy);
+		var length_ = $lue_bird$elm_xy$Xy$length(xy);
 		return (_Utils_cmp(length_, maximumLength) > 0) ? A2(
 			$lue_bird$elm_xy$Xy$map,
 			$elm$core$Basics$mul(maximumLength / length_),
@@ -8257,11 +8269,10 @@ var $turboMaCk$non_empty_list_alias$List$NonEmpty$tail = function (_v0) {
 	return t;
 };
 var $elm$core$Basics$atan2 = _Basics_atan2;
-var $lue_bird$elm_xy$Xy$toAngle = function (direction_) {
-	return A2(
-		$elm$core$Basics$atan2,
-		$lue_bird$elm_xy$Xy$y(direction_),
-		$lue_bird$elm_xy$Xy$x(direction_));
+var $lue_bird$elm_xy$Xy$toAngle = function (_v0) {
+	var x_ = _v0.a;
+	var y_ = _v0.b;
+	return A2($elm$core$Basics$atan2, y_, x_);
 };
 var $avh4$elm_color$Color$toRgba = function (_v0) {
 	var r = _v0.a;

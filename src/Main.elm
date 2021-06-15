@@ -30,7 +30,7 @@ import List.NonEmpty exposing (NonEmpty)
 import Random
 import Task
 import Time exposing (Posix)
-import Xy exposing (Xy, x, xy, y)
+import Xy exposing (Xy, length, x, xy, y)
 
 
 main : Program () (Audio.Model Msg Model) (Audio.Msg Msg)
@@ -642,7 +642,7 @@ randomStar { awayFrom, atLeast } =
     Random.map2 Star
         (Xy.both
             (Random.float atLeast 200 |> randomSign)
-            |> xyRandom
+            |> Xy.random
             |> Random.map (Xy.map2 (+) awayFrom)
         )
         (Random.float 0.02 0.44)
@@ -929,11 +929,6 @@ audio _ { timePlayed, music } =
 -- util
 
 
-with : second -> first -> ( first, second )
-with second =
-    \first -> ( first, second )
-
-
 randomAndMap :
     Random.Generator a
     -> Random.Generator (a -> b)
@@ -947,11 +942,6 @@ difference =
     Xy.map2 (\aC bC -> bC - aC)
 
 
-length : Xy Float -> Float
-length ( x, y ) =
-    sqrt (x ^ 2 + y ^ 2)
-
-
 lengthAtMost : Float -> Xy Float -> Xy Float
 lengthAtMost maximumLength xy =
     let
@@ -963,10 +953,3 @@ lengthAtMost maximumLength xy =
 
     else
         xy
-
-
-xyRandom :
-    Xy (Random.Generator coordinate)
-    -> Random.Generator (Xy coordinate)
-xyRandom =
-    \( x, y ) -> Random.map2 xy x y
